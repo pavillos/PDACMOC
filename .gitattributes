@@ -1,0 +1,4 @@
+inst/training_data/all_datasets.csv filter=lfs diff=lfs merge=lfs -text
+inst/training_data/all_datasets_corrected.csv filter=lfs diff=lfs merge=lfs -text
+inst/saved_workspaces/example.RData filter=lfs diff=lfs merge=lfs -text
+releases/download/v2.4.0/PDACMOC_2.4.0.tar.gz filter=lfs diff=lfs merge=lfs -text

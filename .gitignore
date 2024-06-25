@@ -1,0 +1,8 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+releases/download/v2.4.0/PDACMOC_2.4.0.tar.gz
+inst/saved_workspaces/example.RData
+inst/training_data/all_datasets.csv
+inst/training_data/all_datasets_corrected.csv

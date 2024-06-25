@@ -1,0 +1,54 @@
+library(PDACMOC)
+
+file1 <- system.file('examples', 'example.R', package = 'PDACMOC')
+dir <- file.path(dirname(file1), '../saved_workspaces/example.RData')
+#load(dir)
+rm(file1)
+
+reticulate::use_python("~/Software/miniconda3/envs/PDACMOC/bin/python3.11", required = TRUE)
+
+file2 <- system.file('training_data', 'all_datasets_corrected.csv', package = 'PDACMOC')
+
+samples <- read.csv(file2, row.names = 1, check.names = FALSE)
+rm(file2)
+
+new_samples <- PDACMOC:::import.and.normalize(samples, batch = FALSE, gene_id = 'EnsemblID')
+
+results_collisson <- PDACMOC:::collisson.classify(new_samples)
+
+results_moffitt <- PDACMOC:::moffitt.classify(new_samples)
+
+results_bailey <- PDACMOC:::bailey.classify(new_samples)
+
+results_puleo <- PDACMOC:::puleo.classify(new_samples)
+
+results_chan <- PDACMOC:::chan.classify(new_samples)
+
+results_consensus <- PDACMOC:::PDAConsensus.classify(new_samples)
+
+vm_result <- PDACMOC:::virtual.microdissect(new_samples)
+
+results_stroma_moffitt <- PDACMOC:::stroma.moffitt.classify(vm_result$vm_S)
+
+results_stroma_maurer <- PDACMOC:::stroma.maurer.classify(vm_result$vm_S)
+
+results_stroma_consensus <- PDACMOC:::stroma.PDAConsensus.classify(vm_result$vm_S)
+
+classification_tumor <- PDACMOC::omni.classify(samples, batch = FALSE, gene_id = 'EnsemblID',
+                                               classifier = c('Collisson', 'Moffitt', 'Bailey',
+                                                              'Puleo', 'Chan-Seng-Yue', 'PDAConsensus'))
+ 
+classification_all <- PDACMOC::omni.classify(samples, batch = FALSE, gene_id = 'EnsemblID',
+                                             classifier = c('Collisson', 'Moffitt', 'Bailey',
+                                                            'Puleo', 'Chan-Seng-Yue', 'PDAConsensus'),                                              
+                                             stroma = TRUE,
+                                             stroma_classifier = c('Moffitt',
+                                                                   'Maurer',
+                                                                   'PDAConsensus'))
+
+# change path to your browser
+options(browser = '/usr/bin/firefox')
+shinyjs::useShinyjs()
+runPDACMOC()
+
+#save.image(dir)

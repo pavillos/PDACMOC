@@ -1,0 +1,13 @@
+LICENSE
+
+This work is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/4.0/
+or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+This license applies to all components of this project, including the R package and the associated Shiny application.
+
+For commercial use, please contact pvilloslada@cnio.es.
+
+CERTIFICATE
+
+The content and components of this package are also protected by a copyright certificate secured through blockchain technology. This certification ensures the integrity and immutable proof of authorship and ownership up to the timestamp of the certification. Details of this certification are provided in the `Certificate.pdf` file located under `inst/extdata` within the package.
