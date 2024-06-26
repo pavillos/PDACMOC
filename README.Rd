@@ -83,8 +83,8 @@
   
     ## Download and uncompressed the distribution file
     wget https://github.com/pavillos/PDACMOC/releases/download/v.2.4.0/PDACMOC_2.4.0.tar.gz
-	tar -xvzf PDACMOC_2.4.0.tar.gz
-  
+    tar -xvzf PDACMOC_2.4.0.tar.gz
+    
     ## Install Miniconda
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
     bash Miniconda3-latest-Linux-x86_64.sh
