@@ -40,10 +40,6 @@ It contains the following files:
   - `training_data`: it contains several files used by the classifiers.
 - `man`: it contains the R markdown files produced automatically by devtools::document() using roxygen2 comments.
 - `R`: it contains the different functions of the package.
-- `releases`:
-  - `download`:
-    - `v2.4.0`:
-      - `PDACMOC_2.4.0.tar.gz`: v2.4.0 distribution file.
 - `DESCRIPTION`: description file.
 - `license.txt`: license file.
 - `NAMESPACE`: namespace file produced automatically by devtools::document() using roxygen2 comments.
@@ -63,8 +59,8 @@ To install the `PDACMOC` package, we recommend creating a Miniconda environment 
 
 ```sh
 # Download and uncompress the distribution file
-wget https://github.com/pavillos/PDACMOC/releases/download/v2.4.0/PDACMOC_2.4.0.tar.gz
-tar -xvzf PDACMOC_X.X.X.tar.gz
+wget https://github.com/pavillos/PDACMOC/releases/download/v.2.4.0/PDACMOC_2.4.0.tar.gz
+tar -xvzf PDACMOC_2.4.0.tar.gz
 
 # Install Miniconda
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
