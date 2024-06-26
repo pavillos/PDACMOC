@@ -50,8 +50,6 @@
     \item man: it contains the R markdown files produced automatically by devtools::document() using roxygen2 comments.
     
     \item R: it contains the different functions of the package.
-    
-    \item releases: \itemize{\item download: \itemize{\item v2.4.0: \itemize{\item PDACMOC_2.4.0.tar.gz: v2.4.0 distribution file}}}
           
     \item DESCRIPTION: description file.
     
@@ -84,7 +82,8 @@
   \preformatted{
   
     ## Download and uncompressed the distribution file
-    TBI
+    wget https://github.com/pavillos/PDACMOC/releases/download/v.2.4.0/PDACMOC_2.4.0.tar.gz
+	tar -xvzf PDACMOC_2.4.0.tar.gz
   
     ## Install Miniconda
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
