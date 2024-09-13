@@ -67,7 +67,7 @@ stroma.PDAConsensus.classify <- function(vm_S) {
                                          'Probability' = probability,
                                          'ActivatedScore' = probabilities[,2],
                                          row.names = rownames(vmdata2ML))
-  levels(results_stroma_consensus$Predicted.subtype) <- c('Consensus_normal', 'Consensus_activated')
+  levels(results_stroma_consensus$Predicted.subtype) <- c('Consensus_normal-immune', 'Consensus_activated-ECM')
   rm(vmdata2ML, labels, probabilities, probability)
 
   return(results_stroma_consensus)
