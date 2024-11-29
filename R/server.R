@@ -128,9 +128,9 @@ server <- function(input, output, session) {
                                                options = list(columnDefs = list(list(className = 'dt-center', targets = 1:3)))) %>%
                                      formatStyle('Probability',
                                                    backgroundColor = styleInterval(69, c('red', 'default'))) %>%
-                                     formatRound('BasalScore', 4) %>%
-                                     formatStyle('BasalScore',
-                                                 background = styleColorBar(result$Tumor$PDAConsensus$BasalScore, '#E02438'),
+                                     formatRound('NonClassicalScore', 4) %>%
+                                     formatStyle('NonClassicalScore',
+                                                 background = styleColorBar(result$Tumor$PDAConsensus$NonClassicalScore, '#E02438'),
                                                  backgroundSize = '95% 50%',
                                                  backgroundRepeat = 'no-repeat',
                                                  backgroundPosition = 'right'))
@@ -166,9 +166,9 @@ server <- function(input, output, session) {
                                                         options = list(columnDefs = list(list(className = 'dt-center', targets = 1:3)))) %>%
                                               formatStyle('Probability',
                                                           backgroundColor = styleInterval(69, c('red', 'default'))) %>%
-                                              formatRound('ActivatedScore', 4) %>%
-                                              formatStyle('ActivatedScore',
-                                                          background = styleColorBar(result$Stroma$PDAConsensus$ActivatedScore, '#CE18A2'),
+                                              formatRound('ActivatedECMScore', 4) %>%
+                                              formatStyle('ActivatedECMScore',
+                                                          background = styleColorBar(result$Stroma$PDAConsensus$ActivatedECMScore, '#CE18A2'),
                                                           backgroundSize = '95% 50%',
                                                           backgroundRepeat = 'no-repeat',
                                                           backgroundPosition = 'right'))

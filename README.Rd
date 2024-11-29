@@ -82,8 +82,8 @@
   \preformatted{
   
     ## Download and uncompressed the distribution file
-    wget https://github.com/pavillos/PDACMOC/releases/download/v.2.5.0/PDACMOC_2.5.0.tar.gz
-    tar -xvzf PDACMOC_2.5.0.tar.gz
+    wget https://github.com/pavillos/PDACMOC/releases/download/v.2.5.1/PDACMOC_2.5.1.tar.gz
+    tar -xvzf PDACMOC_2.5.1.tar.gz
     
     ## Install Miniconda
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -141,7 +141,7 @@
     R CMD INSTALL ./PDACMOC/inst/packages/ADVOCATE_0.1.0.tar.gz
 
     ## Install PDACMOC
-    R CMD INSTALL ./PDACMOC_2.5.0.tar.gz
+    R CMD INSTALL ./PDACMOC_2.5.1.tar.gz
     
     ## Open R
     R
