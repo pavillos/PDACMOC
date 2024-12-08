@@ -14,4 +14,4 @@ Imports: ADVOCATE, AnnotationDbi, BiocManager, DESeq2, doMC, DT,
          scales, shiny, shinydashboard, shinyjs, shinythemes
 Depends: R (>= 4.3.2)
 StagedInstall: no
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
