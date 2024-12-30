@@ -67,7 +67,7 @@ PDAConsensus.classify <- function(new_samples) {
                                   'Probability' = probability,
                                   'NonClassicalScore' = probabilities[, 2],
                                   row.names = rownames(data2ML))
-  levels(results_consensus$Predicted.subtype) <- c('Consensus_classical', 'Consensus_non-classical')
+  levels(results_consensus$Predicted.subtype) <- c('Consensus_Classical', 'Consensus_Non-classical')
   rm(data2ML, labels, probabilities, probability)
  
   return(results_consensus)
