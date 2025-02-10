@@ -59,7 +59,7 @@ To install the `PDACMOC` package, we recommend creating a Miniconda environment 
 
 ```sh
 # Download and uncompress the distribution file
-wget https://github.com/pavillos/PDACMOC/releases/download/v.2.5.0/PDACMOC_2.5.1.tar.gz
+wget https://github.com/pavillos/PDACMOC/releases/download/v.2.5.1/PDACMOC_2.5.1.tar.gz
 tar -xvzf PDACMOC_2.5.1.tar.gz
 
 # Install Miniconda
