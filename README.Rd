@@ -156,6 +156,8 @@
 }
 
 \section{Shiny app instructions}{
+  You can access the Shiny app online at \url{https://pdacmoc.cnio.es/}.
+  
   To run the program online:
   \enumerate{
     \item Connect to server.

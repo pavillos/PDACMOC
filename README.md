@@ -137,6 +137,8 @@ q()
 
 ### Shiny app instructions
 
+You can access the Shiny app online at [https://pdacmoc.cnio.es/](https://pdacmoc.cnio.es/).
+
 To run the program online:
 1. Connect to server.
 2. Upload a tsv file with genes in rows and samples in columns (max. 1GB).
