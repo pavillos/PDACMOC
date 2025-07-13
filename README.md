@@ -89,7 +89,7 @@ conda install python=3.11.4
 pip3 install numpy pandas pickle-mixin scikit-learn==1.3.1
 
 # Install R
-conda install -c conda-forge r-base=4.3.2
+conda install -c conda-forge r-base=4.4.0
 
 # Install libuv, libcurl, and libxml2
 conda install -c conda-forge libuv
