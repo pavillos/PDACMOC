@@ -9,6 +9,9 @@
 
 ## PDACMolecularOmniClassifier
 
+[![Zenodo](https://zenodo.org/badge/DOI/10.5281/zenodo.17019897.svg)](https://doi.org/10.5281/zenodo.17019897)
+[![bioRxiv](https://img.shields.io/badge/bioRxiv-10.1101/2025.03.06.641837-6b2e99)](https://doi.org/10.1101/2025.03.06.641837)
+
 This package classifies tumor samples according to several molecular classifiers available using different Machine Learning (ML) approaches. It classifies both tumor and stroma fractions. To classify stroma compartment, it first makes a virtual microdissection through the `ADVOCATE` package.
 
 ### Classifiers available for tumor fractions:
