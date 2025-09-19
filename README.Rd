@@ -82,8 +82,8 @@
   \preformatted{
   
     ## Download and uncompressed the distribution file
-    wget https://github.com/pavillos/PDACMOC/releases/download/v.2.5.1/PDACMOC_2.5.1.tar.gz
-    tar -xvzf PDACMOC_2.5.1.tar.gz
+    wget https://github.com/pavillos/PDACMOC/releases/download/v.2.5.3/PDACMOC_2.5.3.tar.gz
+    tar -xvzf PDACMOC_2.5.3.tar.gz
     
     ## Install Miniconda
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh

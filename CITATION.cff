@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software or dataset, please cite it as follows."
 title: "PDACMOC: PDACMolecularOmniClassifier"
-version: "2.5.2"
+version: "2.5.3"
 doi: "10.5281/zenodo.17019897"
 date-released: "2025-09-01"
 authors:

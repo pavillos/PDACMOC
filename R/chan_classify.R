@@ -63,7 +63,7 @@ chan.classify <- function(new_samples) {
     probability <- c(probability, max_value)
   }
   rm(sample, max_value, probabilities)
-  results_chan <- data.frame('Predicted.subtype' = factor(labels, levels = c('Classical-A', 'Classical-B', 'Basal-A', 'Basal-B', 'Hybrid')),
+  results_chan <- data.frame('Predicted.subtype' = factor(labels, levels = c('Classical-A', 'Classical-B', 'Basal-like-A', 'Basal-like-B', 'Hybrid')),
                              'Probability' = probability,
                              row.names = rownames(data2ML))
   rm(data2ML, labels, probability)
