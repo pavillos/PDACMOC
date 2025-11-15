@@ -32,4 +32,8 @@ authors:
 references:
   - type: article
     title: "Development of a Consensus Molecular Classifier for Pancreatic Ductal Adenocarcinoma"
+    doi: "10.1186/s13073-025-01568-9"
+
+  - type: preprint
+    title: "Development of a Consensus Molecular Classifier for Pancreatic Ductal Adenocarcinoma"
     doi: "10.1101/2025.03.06.641837"
