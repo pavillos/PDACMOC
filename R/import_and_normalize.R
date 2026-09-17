@@ -29,24 +29,43 @@ import.and.normalize <- function(expmat, batch = TRUE, gene_id = 'EnsemblID') {
     stop('The gene IDs are not correct')
   }
   
+  # Check expression values
+  values <- as.matrix(expmat)
+  if (!is.numeric(values)) {
+    stop('The expression matrix must contain only numbers (raw counts). ',
+         'Check that gene IDs are in the first column and samples in the rest')
+  }
+  if (anyNA(values)) {
+    stop('The expression matrix contains missing values (NA)')
+  }
+  if (any(values < 0)) {
+    stop('The expression matrix contains negative values, but raw counts are expected')
+  }
+  rm(values)
+  
+  # Average rows with duplicated gene IDs (only possible in matrices)
+  if (anyDuplicated(rownames(expmat))) {
+    expmat <- collapse.duplicated.genes(expmat, rownames(expmat))
+  }
+  
   # Convert gene ID to EnsemblID
   if (gene_id == 'EntrezID') {
     gene_ids <- as.character(suppressMessages(mapIds(org.Hs.eg.db,
                                                      rownames(expmat),
-                                                     keytype = 'ENTREZ',
+                                                     keytype = 'ENTREZID',
                                                      column = 'ENSEMBL')))
-    expmat <- expmat[!is.na(gene_ids), ]
+    expmat <- expmat[!is.na(gene_ids), , drop = FALSE]
     gene_ids <- gene_ids[!is.na(gene_ids)]
-    rownames(expmat) <- gene_ids
+    expmat <- collapse.duplicated.genes(expmat, gene_ids)
     rm(gene_ids)
   } else if (gene_id == 'GeneSymbol') {
     gene_ids <- as.character(suppressMessages(mapIds(org.Hs.eg.db,
                                                      rownames(expmat),
                                                      keytype = 'SYMBOL',
                                                      column = 'ENSEMBL')))
-    expmat <- expmat[!is.na(gene_ids), ]
+    expmat <- expmat[!is.na(gene_ids), , drop = FALSE]
     gene_ids <- gene_ids[!is.na(gene_ids)]
-    rownames(expmat) <- gene_ids
+    expmat <- collapse.duplicated.genes(expmat, gene_ids)
     rm(gene_ids)
   } else if (gene_id == 'EnsemblID') {
     # Discard gene version
@@ -62,9 +81,18 @@ import.and.normalize <- function(expmat, batch = TRUE, gene_id = 'EnsemblID') {
     }
   }
   
+  # Check that gene IDs were recognised
+  if (nrow(expmat) == 0 || !any(grepl('^ENSG', rownames(expmat)))) {
+    stop('None of the gene IDs could be recognised as ', gene_id, '. Check the gene ID type selected')
+  }
+  
   # Apply batch correction (if there are more than 1 sample)
   if (ncol(expmat) > 1 & batch) {
     all_datasets_file <- system.file('training_data', 'all_datasets.csv', package = 'PDACMOC')
+    if (all_datasets_file == '') {
+      stop('The training data needed for batch correction (all_datasets.csv) is not installed. ',
+           'Install PDACMOC from the release tarball (see README) or set batch = FALSE')
+    }
     all_datasets <- read.csv(all_datasets_file, row.names = 1, check.names = FALSE)
     common_genes <- intersect(rownames(expmat), rownames(all_datasets))
     expmat <- expmat[common_genes, ]
@@ -97,12 +125,17 @@ import.and.normalize <- function(expmat, batch = TRUE, gene_id = 'EnsemblID') {
                                                     genes,
                                                     keytype = 'SYMBOL',
                                                     column = 'ENSEMBL')))
-  expmat <- expmat[rowSums(expmat >= 5) >= num_samples | rownames(expmat) %in% genes_mod, ]
+  expmat <- expmat[rowSums(expmat >= 5) >= num_samples | rownames(expmat) %in% genes_mod, , drop = FALSE]
   rm(genes, genes_mod)
   
   # Apply VST (if there are more than 1 sample) and standard scaler
   expmat <- as.matrix(expmat)
   if (ncol(expmat) > 1) {
+    # VST needs integer counts (averaged duplicates are not integers if batch correction was not applied)
+    if (any(expmat %% 1 != 0)) {
+      message('Non-integer counts were rounded before the variance stabilizing transformation')
+      expmat <- round(expmat)
+    }
     suppressMessages({expmat_vst <- varianceStabilizingTransformation(expmat, blind = FALSE)})
   } else {
     expmat_vst <- expmat
@@ -120,7 +153,7 @@ import.and.normalize <- function(expmat, batch = TRUE, gene_id = 'EnsemblID') {
                                                                 rownames(expmat_scaled),
                                                                 keytype = 'ENSEMBL',
                                                                 column = 'SYMBOL')))
-  new_samples <- new_samples[!is.na(rownames(new_samples)), ]
+  new_samples <- new_samples[!is.na(rownames(new_samples)), , drop = FALSE]
   genes_lost <- nrow(expmat_scaled) - nrow(new_samples) 
   message(genes_lost, ' genes were not been able to convert from ', gene_id,
           ' to GeneSymbol')

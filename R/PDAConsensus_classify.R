@@ -26,7 +26,7 @@ PDAConsensus.classify <- function(new_samples) {
   common_genes <- intersect(genes, rownames(new_samples))
   genes_imputed <- length(genes) - length(common_genes)
   message('PDAConsensus: the expression of ', genes_imputed, ' genes will be imputed')
-  new_samples_filtered <- new_samples[common_genes, ]
+  new_samples_filtered <- new_samples[common_genes, , drop = FALSE]
   rm(genes, common_genes, genes_imputed)
   
   # Impute the expression of missing genes

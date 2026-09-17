@@ -27,7 +27,7 @@ stroma.maurer.classify <- function(vm_S) {
   common_genes <- intersect(genes, rownames(vm_S))
   genes_imputed <- length(genes) - length(common_genes)
   message('Stroma Maurer: the expression of ', genes_imputed, ' genes will be imputed')
-  vm_S_filtered <- vm_S[common_genes, ]
+  vm_S_filtered <- vm_S[common_genes, , drop = FALSE]
   rm(genes, common_genes, genes_imputed)
   
   # Impute the expression of missing genes

@@ -35,18 +35,44 @@ server <- function(input, output, session) {
   output$pdaconsensus_logo <- renderImage(list(src = system.file('logos', 'PDAConsensus_logo.png', package = 'PDACMOC'),
                                                width = '80%'), deleteFile = FALSE)
   
+  # Show messages from the package (e.g. imputed or averaged genes) as notifications
+  with.notifications <- function(expr) {
+    withCallingHandlers(expr, message = function(m) {
+      showNotification(trimws(conditionMessage(m)), type = 'message', duration = 30)
+    })
+  }
+  
+  uploaded <- reactiveVal(NULL)
+  
   observeEvent(input$tsvfile, {
+    
+    uploaded(NULL)
+    shinyjs::disable("runButton")
     
     if (!grepl("\\.tsv$", input$tsvfile$name, ignore.case = TRUE)) {
       showNotification("Invalid file format. Please upload a tsv file.", type = "error")
-      shinyjs::disable("runButton")
       return(NULL)
     }
     
-    shinyjs::enable("runButton")
-    df <- read.csv(input$tsvfile$datapath, sep = '\t', header = TRUE, row.names = 1, check.names = FALSE)
+    df <- tryCatch(with.notifications(read.expression.file(input$tsvfile$datapath)),
+                   error = function(e) {
+                     showNotification(paste0("The file could not be read: ", conditionMessage(e)),
+                                      type = "error", duration = NULL)
+                     NULL
+                   })
+    if (is.null(df)) {
+      return(NULL)
+    }
     
-    observeEvent(input$runButton, {
+    uploaded(df)
+    shinyjs::enable("runButton")
+    
+  })
+  
+  observeEvent(input$runButton, {
+      
+      df <- uploaded()
+      req(df)
       
       runjs('document.getElementById("tsvfile").disabled = "true";')
       runjs('document.getElementById("batch").style.display = "none";')
@@ -57,16 +83,26 @@ server <- function(input, output, session) {
       runjs('document.getElementById("runButton").disabled = "true";')
             
       start_time <- Sys.time()
-      if (input$stroma == 'Yes') {
-        if (input$batch == 'Yes') {batch_opt <- TRUE} else if (input$batch == 'No') {batch_opt <- FALSE}
-        result <- omni.classify(df, batch = batch_opt, gene_id = input$gene_id,
-                                classifier = input$tumor_classifiers,
-                                stroma = TRUE,
-                                stroma_classifier = input$stroma_classifiers)
-      } else if (input$stroma == 'No') {
-        if (input$batch == 'Yes') {batch_opt <- TRUE} else if (input$batch == 'No') {batch_opt <- FALSE}
-        result <- omni.classify(df, batch = batch_opt, gene_id = input$gene_id,
-                                classifier = input$tumor_classifiers)
+      result <- tryCatch(with.notifications({
+        if (input$stroma == 'Yes') {
+          if (input$batch == 'Yes') {batch_opt <- TRUE} else if (input$batch == 'No') {batch_opt <- FALSE}
+          omni.classify(df, batch = batch_opt, gene_id = input$gene_id,
+                        classifier = input$tumor_classifiers,
+                        stroma = TRUE,
+                        stroma_classifier = input$stroma_classifiers)
+        } else if (input$stroma == 'No') {
+          if (input$batch == 'Yes') {batch_opt <- TRUE} else if (input$batch == 'No') {batch_opt <- FALSE}
+          omni.classify(df, batch = batch_opt, gene_id = input$gene_id,
+                        classifier = input$tumor_classifiers)
+        }
+      }), error = function(e) {
+        showNotification(paste0("The classification could not be completed: ", conditionMessage(e),
+                                ". Press 'Reset app' to try again."),
+                         type = "error", duration = NULL)
+        NULL
+      })
+      if (is.null(result)) {
+        return(NULL)
       }
 
       end_time <- Sys.time()
@@ -265,17 +301,16 @@ server <- function(input, output, session) {
           output$downloadConsensusstroma <- downloadHandler(
             filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_PDAConsensus_stroma_classification.csv')},
             content = function(file) {
-              write.csv(result$Stroma$Consensus, file, row.names = TRUE)
+              write.csv(result$Stroma$PDAConsensus, file, row.names = TRUE)
             }
           )
         }
       }
       
-    })
-
-    observeEvent(input$resetButton, {
-      session$reload()
-    })
-    
   })
+  
+  observeEvent(input$resetButton, {
+    session$reload()
+  })
+  
 }

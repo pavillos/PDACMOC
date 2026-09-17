@@ -10,6 +10,8 @@
   This package classifies tumor samples according to several molecular classifiers available using different Machine Learning (ML) approaches.
   It classifies both tumor and stroma fractions. To classify stroma compartment, it first makes a virtual microdissection through the \pkg{ADVOCATE} package.
   
+  See \file{NEWS.md} for the changes in each version.
+  
   Classifiers available for tumor fractions:
   \enumerate{
     \item Collisson et al., 2011.
@@ -42,7 +44,7 @@
         \item graphs_and_tables: it contains two figures that appear in the Shiny app.
         \item logos: it contains some institutional logos.
         \item models: it contains ML models saved as pickle format.
-        \item packages: it contains a compressed file (`ADVOCATE_0.1.0.tar.gz`) used to install ADVOCATE package.
+        \item packages: it contains a compressed file (`ADVOCATE_0.1.0.1.tar.gz`) used to install ADVOCATE package.
         \item saved_workspaces: it contains the workspaces generated with the example script.
         \item training_data: it contains several files used by the classifiers.
       }
@@ -82,8 +84,8 @@
   \preformatted{
   
     ## Download and uncompressed the distribution file
-    wget https://github.com/pavillos/PDACMOC/releases/download/v.2.5.4/PDACMOC_2.5.4.tar.gz
-    tar -xvzf PDACMOC_2.5.4.tar.gz
+    wget https://github.com/pavillos/PDACMOC/releases/download/v.2.5.5/PDACMOC_2.5.5.tar.gz
+    tar -xvzf PDACMOC_2.5.5.tar.gz
     
     ## Install Miniconda
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -138,10 +140,10 @@
     q()
                                 
     ## Install ADVOCATE
-    R CMD INSTALL ./PDACMOC/inst/packages/ADVOCATE_0.1.0.tar.gz
+    R CMD INSTALL ./PDACMOC/inst/packages/ADVOCATE_0.1.0.1.tar.gz
 
     ## Install PDACMOC
-    R CMD INSTALL ./PDACMOC_2.5.4.tar.gz
+    R CMD INSTALL ./PDACMOC_2.5.5.tar.gz
     
     ## Open R
     R

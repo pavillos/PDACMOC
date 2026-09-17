@@ -10,10 +10,12 @@
 ## PDACMolecularOmniClassifier
 
 [![Genome Medicine](https://img.shields.io/badge/Genome%20Medicine-10.1186/s13073--025--01568--9-6B2E99)](https://doi.org/10.1186/s13073-025-01568-9)
-[![Zenodo](https://img.shields.io/badge/Zenodo-10.5281/zenodo.18859571-185C84)](https://doi.org/10.5281/zenodo.18859571)
+[![Zenodo](https://img.shields.io/badge/Zenodo-10.5281/zenodo.17019896-185C84)](https://doi.org/10.5281/zenodo.17019896)
 [![bioRxiv](https://img.shields.io/badge/bioRxiv-10.1101/2025.03.06.641837-B8925A)](https://doi.org/10.1101/2025.03.06.641837)
 
 This package classifies tumor samples according to several molecular classifiers available using different Machine Learning (ML) approaches. It classifies both tumor and stroma fractions. To classify stroma compartment, it first makes a virtual microdissection through the `ADVOCATE` package.
+
+See [NEWS.md](NEWS.md) for the changes in each version.
 
 ### Classifiers available for tumor fractions:
 1. Collisson et al., 2011.
@@ -39,7 +41,7 @@ It contains the following files:
   - `graphs_and_tables`: it contains two figures that appear in the Shiny app.
   - `logos`: it contains some institutional logos.
   - `models`: it contains ML models saved as pickle format.
-  - `packages`: it contains a compressed file (`ADVOCATE_0.1.0.tar.gz`) used to install ADVOCATE package.
+  - `packages`: it contains a compressed file (`ADVOCATE_0.1.0.1.tar.gz`) used to install ADVOCATE package.
   - `saved_workspaces`: it contains the workspaces generated with the example script.
   - `training_data`: it contains several files used by the classifiers.
 - `man`: it contains the R markdown files produced automatically by devtools::document() using roxygen2 comments.
@@ -63,8 +65,8 @@ To install the `PDACMOC` package, we recommend creating a Miniconda environment 
 
 ```sh
 # Download and uncompress the distribution file
-wget https://github.com/pavillos/PDACMOC/releases/download/v.2.5.4/PDACMOC_2.5.4.tar.gz
-tar -xvzf PDACMOC_2.5.4.tar.gz
+wget https://github.com/pavillos/PDACMOC/releases/download/v.2.5.5/PDACMOC_2.5.5.tar.gz
+tar -xvzf PDACMOC_2.5.5.tar.gz
 
 # Install Miniconda
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -122,10 +124,10 @@ q()
 
 ```sh
 # Install ADVOCATE
-R CMD INSTALL ./PDACMOC/inst/packages/ADVOCATE_0.1.0.tar.gz
+R CMD INSTALL ./PDACMOC/inst/packages/ADVOCATE_0.1.0.1.tar.gz
 
 # Install PDACMOC
-R CMD INSTALL ./PDACMOC_2.5.4.tar.gz
+R CMD INSTALL ./PDACMOC_2.5.5.tar.gz
 
 # Open R
 R
