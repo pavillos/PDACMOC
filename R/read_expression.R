@@ -11,6 +11,7 @@
 #' @param gene_ids Character vector with the gene ID of each row
 #'
 #' @return expmat with one row per gene ID
+#' @usage collapse.duplicated.genes(expmat, gene_ids)
 
 collapse.duplicated.genes <- function(expmat, gene_ids) {
 
@@ -30,34 +31,62 @@ collapse.duplicated.genes <- function(expmat, gene_ids) {
 
 }
 
-#' @title Read expression file
+#' @title Read counts
 #'
 #' @author Villoslada-Blanco, Pablo
 #'
 #' @description
-#' Read a tab-separated file with gene IDs in the first column and samples in the
-#' remaining columns. Rows with duplicated gene IDs are averaged. The header may
-#' include a name for the gene ID column or omit it.
+#' Read a file of raw counts with gene IDs in the first column and samples in the
+#' remaining columns, as the Shiny app does. The separator (tab, comma or semicolon)
+#' is detected from the header, so .tsv, .csv and .txt files are accepted. Rows with
+#' duplicated gene IDs are averaged. The header may include a name for the gene ID
+#' column or omit it. The result can be passed to \code{omni.classify}.
 #'
-#' @param path Path to the tsv file
+#' @param path Path to the file
 #'
 #' @return data frame with genes in rows and samples in columns
+#'
+#' @examples
+#' \dontrun{
+#' counts <- read.counts('my_counts.csv')
+#' classification <- omni.classify(counts, gene_id = 'EnsemblID')
+#' }
+#'
+#' @aliases read.expression.file
+#' @export
 
-read.expression.file <- function(path) {
+read.counts <- function(path) {
 
   first_lines <- readLines(path, n = 2, warn = FALSE)
   if (length(first_lines) < 2) {
     stop('The file must have a header and at least one gene')
   }
-  header <- strsplit(first_lines[1], '\t', fixed = TRUE)[[1]]
-  n_fields <- length(strsplit(first_lines[2], '\t', fixed = TRUE)[[1]])
+
+  # Separator: tab first (as in previous versions), then comma, then semicolon
+  sep <- if (grepl('\t', first_lines[1], fixed = TRUE)) {
+    '\t'
+  } else if (grepl(',', first_lines[1], fixed = TRUE)) {
+    ','
+  } else if (grepl(';', first_lines[1], fixed = TRUE)) {
+    ';'
+  } else {
+    stop('The separator could not be detected: use tabs, commas or semicolons between columns')
+  }
+  read_file <- function(...) {
+    if (sep == '\t') read.delim(path, check.names = FALSE, ...)
+    else read.table(path, sep = sep, quote = '"', comment.char = '', fill = TRUE,
+                    check.names = FALSE, ...)
+  }
+
+  header <- strsplit(first_lines[1], sep, fixed = TRUE)[[1]]
+  n_fields <- length(strsplit(first_lines[2], sep, fixed = TRUE)[[1]])
 
   if (n_fields == length(header) + 1) {
     # Header without a name for the gene ID column
-    expmat <- read.delim(path, header = FALSE, skip = 1, check.names = FALSE)
+    expmat <- read_file(header = FALSE, skip = 1)
     colnames(expmat) <- c('GeneID', gsub('^"|"$', '', header))
   } else {
-    expmat <- read.delim(path, header = TRUE, check.names = FALSE)
+    expmat <- read_file(header = TRUE)
   }
   if (ncol(expmat) < 2) {
     stop('The file must have gene IDs in the first column and at least one sample column')
@@ -69,3 +98,6 @@ read.expression.file <- function(path) {
   return(expmat)
 
 }
+
+# Former internal name, kept so existing scripts keep working
+read.expression.file <- read.counts

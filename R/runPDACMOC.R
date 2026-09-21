@@ -20,5 +20,6 @@
 #' @export
 
 runPDACMOC <- function(){
+  serve.usage()
   shinyApp(ui, server, options = list(host = "0.0.0.0", port = 1995, launch.browser = FALSE))
 }

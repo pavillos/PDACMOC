@@ -1,7 +1,7 @@
 Package: PDACMOC
 Type: Package
 Title: PDACMolecularOmniClassifier
-Version: 2.5.5
+Version: 2.6.0
 Author: Pablo Villoslada-Blanco, Lola Alonso, Evangelina López de Maturana, Sergio Sabroso-Lasa, Miguel Maquedano, and Núria Malats - GMEG, CNIO
 Description: This package classifies tumor samples according to several molecular classifiers available using different Machine Learning (ML) approaches. It classifies both tumor and stroma fractions. To classify stroma compartment it first makes a virtual microdissection.
 License: file LICENSE
@@ -9,9 +9,10 @@ Encoding: UTF-8
 Config/reticulate: list(packages = list(list(package = "numpy"),
                    list(package = "pandas"), list(package = "pickle-mixin"),
                    list(package = "scikit-learn")))
-Imports: ADVOCATE, AnnotationDbi, BiocManager, DESeq2, doMC, dplyr, DT,
+Imports: ADVOCATE, AnnotationDbi, BiocManager, bslib, DESeq2, doMC, dplyr, DT,
+         ggplot2, grDevices, htmltools,
          foreach, iterators, org.Hs.eg.db, parallel, mclust, reticulate,
          scales, shiny, shinydashboard, shinyjs, shinythemes, sva
 Depends: R (>= 4.4.0)
 StagedInstall: no
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.1.0

@@ -1,3 +1,27 @@
+# PDACMOC 2.6.0
+
+New Shiny app and simpler installation. Classification results are identical to 2.5.5.
+
+* Redesigned Shiny app with five tabs (Classify, Results, Summary, Performance, Help),
+  subtypes in the colours used in the paper, a High/Low confidence column, subtype
+  summaries and the published balanced accuracy of every classifier. Light and dark mode.
+* Classifications run in the background: the app stays responsive, shows the progress and
+  the estimated time, and a classification can be cancelled at any time. At most two
+  classifications run at the same time on a server (`options(PDACMOC.max_jobs = n)`);
+  later ones wait for a free slot.
+* Messages about the file and the classification (e.g. averaged or imputed genes) are
+  listed in the Run card instead of pop-up notifications.
+* 'Reset app' is now 'New classification', available once there are results.
+* The app accepts .tsv, .csv and .txt files. `read.counts()` is exported to read files the
+  same way from R (the former internal `read.expression.file()` still works).
+* Installation: `install/install.sh` creates a conda environment with all the dependencies,
+  including the pinned scikit-learn 1.3.1 and org.Hs.eg.db 3.18.0. The README explains it
+  in three commands.
+* The public server counts finished classifications and classified samples (totals only,
+  nothing about the users or their data) for the usage badge of the README. The counter is
+  off unless `options(PDACMOC.stats_dir)` is set.
+* New dependencies: bslib and ggplot2.
+
 # PDACMOC 2.5.5
 
 Bug fixes. Classification results for inputs that already worked in 2.5.4 are unchanged.

@@ -104,6 +104,7 @@ import.and.normalize <- function(expmat, batch = TRUE, gene_id = 'EnsemblID') {
                     rep('ICGC_v84', 190),
                     rep('PanGenEU', 107))
     batch_info <- factor(batch_info, levels = c('new_samples', 'TCGA', 'ICGC_v100', 'ICGC_v84', 'PanGenEU'))
+    report.progress('Applying batch correction', 0.2)
     if (shiny::isRunning()) {
       withProgress(message = 'Applying batch correction', value = 0.2, {
         tmp <- capture.output(all_datasets_corrected <- ComBat_seq(counts = as.matrix(all_datasets), batch = batch_info))

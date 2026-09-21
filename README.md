@@ -13,6 +13,18 @@
 [![Zenodo](https://img.shields.io/badge/Zenodo-10.5281/zenodo.17019896-185C84)](https://doi.org/10.5281/zenodo.17019896)
 [![bioRxiv](https://img.shields.io/badge/bioRxiv-10.1101/2025.03.06.641837-B8925A)](https://doi.org/10.1101/2025.03.06.641837)
 
+[![Release](https://img.shields.io/github/v/release/pavillos/PDACMOC?label=release&color=185C84)](https://github.com/pavillos/PDACMOC/releases/latest)
+[![Package downloads](https://img.shields.io/github/downloads/pavillos/PDACMOC/total?label=package%20downloads&color=185C84)](https://github.com/pavillos/PDACMOC/releases)
+[![Downloads of the latest release](https://img.shields.io/github/downloads/pavillos/PDACMOC/latest/total?label=downloads%40latest&color=185C84)](https://github.com/pavillos/PDACMOC/releases/latest)
+[![Zenodo downloads](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fzenodo.org%2Fapi%2Frecords%2F17019896&query=%24.stats.downloads&label=Zenodo%20downloads&color=185C84)](https://doi.org/10.5281/zenodo.17019896)
+[![Zenodo views](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fzenodo.org%2Fapi%2Frecords%2F17019896&query=%24.stats.views&label=Zenodo%20views&color=185C84)](https://doi.org/10.5281/zenodo.17019896)
+[![Citations](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.ebi.ac.uk%2Feuropepmc%2Fwebservices%2Frest%2Fsearch%3Fquery%3DDOI%3A10.1186%2Fs13073-025-01568-9%26format%3Djson%26resultType%3Dcore&query=%24.resultList.result%5B0%5D.citedByCount&label=citations&color=6B2E99)](https://doi.org/10.1186/s13073-025-01568-9)
+[![GitHub clones](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgist.githubusercontent.com%2Fpavillos%2Fe55b1802a1ed7b3b815189d7e0c0b802%2Fraw%2Ftraffic.json&query=%24.clones&label=GitHub%20clones%20since%20Sep%202026&color=185C84)](https://github.com/pavillos/PDACMOC)
+[![GitHub views](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgist.githubusercontent.com%2Fpavillos%2Fe55b1802a1ed7b3b815189d7e0c0b802%2Fraw%2Ftraffic.json&query=%24.views&label=GitHub%20views%20since%20Sep%202026&color=185C84)](https://github.com/pavillos/PDACMOC)
+[![Shiny classifications](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdacmoc.cnio.es%2Fstats%2Fusage.json&query=%24.classifications&label=Shiny%20classifications&color=6B2E99)](https://pdacmoc.cnio.es)
+[![Samples classified in the Shiny app](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdacmoc.cnio.es%2Fstats%2Fusage.json&query=%24.samples&label=samples%20classified&color=6B2E99)](https://pdacmoc.cnio.es)
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/license-CC%20BY--NC%204.0-lightgrey)](LICENSE)
+
 This package classifies tumor samples according to several molecular classifiers available using different Machine Learning (ML) approaches. It classifies both tumor and stroma fractions. To classify stroma compartment, it first makes a virtual microdissection through the `ADVOCATE` package.
 
 See [NEWS.md](NEWS.md) for the changes in each version.
@@ -34,6 +46,7 @@ See [NEWS.md](NEWS.md) for the changes in each version.
 The package has been built for Linux (Ubuntu 22.04.3 LTS).
 
 It contains the following files:
+- `install`: conda environment and installer (see Installation).
 - `inst`:
   - `examples`: it contains a R script (`example.R`) with some examples.
   - `extdata`: it contains the `Certificate.pdf`.
@@ -61,107 +74,47 @@ It contains the following files:
 
 ### Installation
 
-To install the `PDACMOC` package, we recommend creating a Miniconda environment following these instructions:
+PDACMOC runs on Linux and needs [conda](https://conda-forge.org/download/) (Miniforge or Miniconda). The installer creates a conda environment called `pdacmoc` with R, Python and all the dependencies:
 
 ```sh
-# Download and uncompress the distribution file
-wget https://github.com/pavillos/PDACMOC/releases/download/v.2.5.5/PDACMOC_2.5.5.tar.gz
-tar -xvzf PDACMOC_2.5.5.tar.gz
-
-# Install Miniconda
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh
-rm Miniconda3-latest-Linux-x86_64.sh
-
-# Close and open terminal
-
-# Update conda
-conda update conda
-
-# Create conda environment
-conda create -n PDACMOC
-
-# Activate conda environment
-conda activate PDACMOC
-
-# Add conda-forge and bioconda channels
-conda config --env --add channels conda-forge
-conda config --env --add channels bioconda
-
-# Install Python
-conda install python=3.11.4
-
-# Install Python modules
-pip3 install numpy pandas pickle-mixin scikit-learn==1.3.1
-
-# Install R
-conda install -c conda-forge r-base=4.4.0
-
-# Install libuv, libcurl, and libxml2
-conda install -c conda-forge libuv
-conda install -c conda-forge libcurl
-conda install -c conda-forge libxml2
-
-# Change PKG_CONFIG_PATH
-# change path to your miniconda3 environment
-export PKG_CONFIG_PATH="/home/pvilloslada/Software/miniconda3/envs/PDACMOC/lib/pkgconfig/:$PKG_CONFIG_PATH"
-
-# Open R
-R
+wget https://github.com/pavillos/PDACMOC/releases/download/v.2.6.0/PDACMOC_2.6.0.tar.gz
+tar -xzf PDACMOC_2.6.0.tar.gz
+bash PDACMOC/install/install.sh PDACMOC_2.6.0.tar.gz
 ```
+
+To use it, run `conda activate pdacmoc`, open R and load the package, pointing `reticulate` to the Python of the environment (the installer prints its path):
 
 ```r
-# Install R packages
-options(repos = c(CRAN = 'https://cloud.r-project.org/'))
-install.packages(c('BiocManager', 'doMC', 'dplyr', 'DT', 'foreach',
-                   'iterators', 'mclust', 'plyr', 'reticulate', 'scales',
-                   'shiny', 'shinydashboard', 'shinyjs', 'shinythemes'))
-BiocManager::install(c('AnnotationDbi', 'DESeq2', 'org.Hs.eg.db', 'sva'))
-
-# Close R
-q()
-```
-
-```sh
-# Install ADVOCATE
-R CMD INSTALL ./PDACMOC/inst/packages/ADVOCATE_0.1.0.1.tar.gz
-
-# Install PDACMOC
-R CMD INSTALL ./PDACMOC_2.5.5.tar.gz
-
-# Open R
-R
-```
-
-```r
-# Check if PDACMOC can be loaded
+reticulate::use_python('~/miniconda3/envs/pdacmoc/bin/python', required = TRUE)
 library(PDACMOC)
-
-# Close R
-q()
 ```
+
+The environment pins scikit-learn 1.3.1 and org.Hs.eg.db 3.18.0, the versions the published models were built with: newer versions change the classification. Do not update them by hand.
 
 ### Shiny app instructions
 
-You can access the Shiny app online at [https://pdacmoc.cnio.es/](https://pdacmoc.cnio.es/).
+Use it online at [https://pdacmoc.cnio.es/](https://pdacmoc.cnio.es/), or on your computer with `runPDACMOC()`.
 
-To run the program online:
-1. Connect to server.
-2. Upload a tsv file with genes in rows and samples in columns (max. 1GB).
-3. Select if you want to apply or not batch correction.
-4. Select the gene ID type.
-5. Select one or more tumor classifiers.
-6. Select if you want to include or not stroma classification.
-7. If you want to include stroma classification, select one or more stroma classifiers.
-8. Press 'Run classification' and wait about 15-20 minutes.
-9. If you want to upload another tsv file press 'Reset app'.
+1. Upload a .tsv or .csv file of raw counts with genes in rows and samples in columns (max. 1GB).
+2. Choose batch correction, the gene ID type, the tumor classifiers and, optionally, the stroma classifiers.
+3. Press 'Run classification'. The Run card shows the progress, the estimated time and any message about your file; you can cancel at any time.
+4. When it finishes, the app opens the results. Press 'New classification' to classify another file.
 
 After the process you will find the following:
-1. Table of tumor/stroma proportions. 'E' stands for epithelium, 'S' stands for stroma, and 'O' stands for others. 'conf' refers to 95% confidence intervals.
-2. Up to 6 tables of tumor classification.
-3. Up to 6 summary tables of tumor classification.
-4. Up to 3 tables of stroma classification.
-5. Up to 3 summary tables of stroma classification.
+1. In the Results tab, one table per classifier with the predicted subtype (in the colours used in the paper), its probability and a flag when the probability is below the threshold of that classifier (low confidence). *PDAConsensus* tables also show the NonClassicalScore or ActivatedECMScore.
+2. In the Results tab, the table of tumor/stroma proportions (only with stroma classification). 'E' stands for epithelium, 'S' stands for stroma, and 'O' stands for others. 'conf' refers to 95% confidence intervals.
+3. In the Summary tab, the number of samples assigned to each subtype for every classifier.
+4. In the Performance tab, the published balanced accuracy of every classifier.
+
+### Classifying your own files from R
+
+`read.counts()` reads a file of raw counts the same way the Shiny app does: it accepts .tsv, .csv and .txt files, detects the separator and averages rows with duplicated gene IDs.
+
+```r
+library(PDACMOC)
+counts <- read.counts('my_counts.csv')
+classification <- omni.classify(counts, gene_id = 'EnsemblID')
+```
 
 ### Keywords
 
@@ -238,8 +191,8 @@ dir <- file.path(dirname(file1), '../saved_workspaces/example.RData')
 #load(dir)
 rm(file1)
 
-# change path to your miniconda3 environment
-reticulate::use_python("~/Software/miniconda3/envs/PDACMOC/bin/python3.11", required = TRUE)
+# Python of the pdacmoc environment (printed by the installer)
+reticulate::use_python('~/miniconda3/envs/pdacmoc/bin/python', required = TRUE)
 
 file2 <- system.file('training_data', 'all_datasets_corrected.csv', package = 'PDACMOC')
 

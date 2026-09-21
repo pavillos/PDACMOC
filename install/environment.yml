@@ -1,0 +1,44 @@
+# Runtime environment for the PDACMOC R package and Shiny app.
+# Do not use it directly: run install.sh, which also installs the pinned
+# annotation package, ADVOCATE and PDACMOC.
+#
+# Pins (keep until the models are retrained):
+# - scikit-learn 1.3.1: the Random Forest models (PDAConsensus) were pickled with it and
+#   give wrong probabilities with newer versions. numpy/pandas/python stay compatible with it.
+# - org.Hs.eg.db 3.18.0 (installed by install.sh): newer releases change a few symbol-to-Ensembl
+#   mappings (e.g. LINC01948) and slightly change Chan-Seng-Yue outputs.
+name: pdacmoc
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  # Python side (models are loaded through reticulate)
+  - python=3.11
+  - numpy=1.26.4
+  - pandas=2.2.0
+  - scikit-learn=1.3.1
+  # R and CRAN packages
+  - r-base=4.5
+  - r-biocmanager
+  - r-bslib
+  - r-domc
+  - r-dplyr
+  - r-dt
+  - r-foreach
+  - r-ggplot2
+  - r-htmltools
+  - r-iterators
+  - r-mass
+  - r-mclust
+  - r-plyr
+  - r-reticulate
+  - r-scales
+  - r-shiny
+  - r-shinydashboard
+  - r-shinyjs
+  - r-shinythemes
+  # Bioconductor packages (org.Hs.eg.db is installed by install.sh)
+  - bioconductor-annotationdbi
+  - bioconductor-deseq2
+  - bioconductor-sva

@@ -20,44 +20,69 @@ server <- function(input, output, session) {
   
   options(shiny.maxRequestSize = 1000*1024^2)
   
-  output$tumor_img <- renderImage(list(src = system.file('graphs_and_tables', 'balanced_accuracy_tumor.png', package = 'PDACMOC'),
-                                       width = '500px'), deleteFile = FALSE)
-  output$stroma_img <- renderImage(list(src = system.file('graphs_and_tables', 'balanced_accuracy_stroma.png', package = 'PDACMOC'),
-                                        width = '500px'), deleteFile = FALSE)
+  # Published performance, drawn to match the colour mode chosen by the user
+  dark_mode <- reactive({ identical(input$colour_mode, 'dark') })
+  output$tumor_img <- renderPlot(accuracy.radar(published.accuracy()$tumor, dark_mode()),
+                                 bg = 'transparent', res = 96)
+  output$stroma_img <- renderPlot(accuracy.radar(published.accuracy()$stroma, dark_mode()),
+                                  bg = 'transparent', res = 96)
   
   output$cnio_logo <- renderImage(list(src = system.file('logos', 'CNIO.jpg', package = 'PDACMOC'),
-                                       width = '100%'), deleteFile = FALSE)
+                                       height = '34px', alt = 'CNIO'), deleteFile = FALSE)
   output$gmeg_logo <- renderImage(list(src = system.file('logos', 'GMEG.png', package = 'PDACMOC'),
-                                       width = '75%'), deleteFile = FALSE)
+                                       height = '40px', alt = 'GMEG'), deleteFile = FALSE)
   
   output$pdacmoc_logo <- renderImage(list(src = system.file('logos', 'PDACMOC_logo.png', package = 'PDACMOC'),
-                                          width = '75%'), deleteFile = FALSE)
+                                          height = '36px', alt = 'PDACMOC'), deleteFile = FALSE)
   output$pdaconsensus_logo <- renderImage(list(src = system.file('logos', 'PDAConsensus_logo.png', package = 'PDACMOC'),
-                                               width = '80%'), deleteFile = FALSE)
+                                               height = '26px', alt = 'PDAConsensus'), deleteFile = FALSE)
   
-  # Show messages from the package (e.g. imputed or averaged genes) as notifications
-  with.notifications <- function(expr) {
+  # Messages shown in the Run card of the Classify tab. Those about the file stay until
+  # another file is uploaded; those of a classification until the next one starts.
+  messages <- reactiveVal(data.frame(source = character(0), type = character(0), text = character(0)))
+  add.message <- function(text, type = 'info', source = 'file') {
+    messages(rbind(isolate(messages()), data.frame(source = source, type = type, text = text)))
+  }
+  clear.messages <- function(source) {
+    current <- isolate(messages())
+    messages(current[current$source != source, , drop = FALSE])
+  }
+
+  # Messages from the package while reading the file (e.g. averaged genes)
+  with.messages <- function(expr) {
     withCallingHandlers(expr, message = function(m) {
-      showNotification(trimws(conditionMessage(m)), type = 'message', duration = 30)
+      add.message(trimws(conditionMessage(m)))
+      invokeRestart('muffleMessage')
     })
   }
   
+  # Summary cards before a classification finishes
+  summary_ids <- c('overview_collisson', 'overview_moffitt', 'overview_bailey', 'overview_puleo',
+                   'overview_chan', 'overview_consensus', 'overview_moffitt_stroma',
+                   'overview_maurer_stroma', 'overview_consensus_stroma')
+  for (id in summary_ids) {
+    local({
+      output_id <- id
+      output[[output_id]] <- renderUI(div(class = 'summary-empty', 'No classification yet.'))
+    })
+  }
+
   uploaded <- reactiveVal(NULL)
   
   observeEvent(input$tsvfile, {
     
     uploaded(NULL)
     shinyjs::disable("runButton")
-    
-    if (!grepl("\\.tsv$", input$tsvfile$name, ignore.case = TRUE)) {
-      showNotification("Invalid file format. Please upload a tsv file.", type = "error")
+    clear.messages('file')
+
+    if (!grepl("\\.(tsv|csv|txt)$", input$tsvfile$name, ignore.case = TRUE)) {
+      add.message("Invalid file format. Please upload a .tsv, .csv or .txt file.", type = "error")
       return(NULL)
     }
-    
-    df <- tryCatch(with.notifications(read.expression.file(input$tsvfile$datapath)),
+
+    df <- tryCatch(with.messages(read.counts(input$tsvfile$datapath)),
                    error = function(e) {
-                     showNotification(paste0("The file could not be read: ", conditionMessage(e)),
-                                      type = "error", duration = NULL)
+                     add.message(paste0("The file could not be read: ", conditionMessage(e)), type = "error")
                      NULL
                    })
     if (is.null(df)) {
@@ -69,246 +94,246 @@ server <- function(input, output, session) {
     
   })
   
-  observeEvent(input$runButton, {
-      
-      df <- uploaded()
-      req(df)
-      
-      runjs('document.getElementById("tsvfile").disabled = "true";')
-      runjs('document.getElementById("batch").style.display = "none";')
-      runjs('document.getElementById("gene_id").style.display = "none";')
-      runjs('document.getElementById("tumor_classifiers").style.display = "none";')
-      runjs('document.getElementById("stroma").style.display = "none";')
-      runjs('document.getElementById("stroma_classifiers").style.display = "none";')
-      runjs('document.getElementById("runButton").disabled = "true";')
-            
-      start_time <- Sys.time()
-      result <- tryCatch(with.notifications({
-        if (input$stroma == 'Yes') {
-          if (input$batch == 'Yes') {batch_opt <- TRUE} else if (input$batch == 'No') {batch_opt <- FALSE}
-          omni.classify(df, batch = batch_opt, gene_id = input$gene_id,
-                        classifier = input$tumor_classifiers,
-                        stroma = TRUE,
-                        stroma_classifier = input$stroma_classifiers)
-        } else if (input$stroma == 'No') {
-          if (input$batch == 'Yes') {batch_opt <- TRUE} else if (input$batch == 'No') {batch_opt <- FALSE}
-          omni.classify(df, batch = batch_opt, gene_id = input$gene_id,
-                        classifier = input$tumor_classifiers)
-        }
-      }), error = function(e) {
-        showNotification(paste0("The classification could not be completed: ", conditionMessage(e),
-                                ". Press 'Reset app' to try again."),
-                         type = "error", duration = NULL)
-        NULL
-      })
-      if (is.null(result)) {
-        return(NULL)
-      }
+  # Hide or show the options while a classification runs
+  lock.controls <- function(locked) {
+    for (id in c('batch', 'gene_id', 'tumor_classifiers', 'stroma', 'stroma_classifiers')) {
+      runjs(sprintf('document.getElementById("%s").style.display = "%s";', id, if (locked) 'none' else ''))
+    }
+    runjs(sprintf('document.getElementById("tsvfile").disabled = %s;', if (locked) 'true' else 'false'))
+    if (locked) shinyjs::disable('runButton') else shinyjs::enable('runButton')
+  }
 
-      end_time <- Sys.time()
-      time_in_seconds <- as.numeric(difftime(end_time, start_time, units = "secs"))
-      if (time_in_seconds >= 60) {
-        time_in_minutes <- round(time_in_seconds / 60, 2)
-        showNotification(paste0("Classification has finished in ", time_in_minutes, " minutes"), duration = 60)
-      } else {
-        showNotification(paste0("Classification has finished in ", round(time_in_seconds, 2), " seconds"), duration = 60)
+  # Fill the Results and Summary tabs and the downloads from a finished classification
+  show.results <- function(result, settings) {
+    # Results and summary of one classifier (display only; downloads use `result`)
+    show.classifier <- function(table_id, summary_id, results, classifier, threshold) {
+      output[[table_id]] <- renderDT(classification.table(results, classifier, threshold))
+      output[[summary_id]] <- renderUI(subtype.summary(results, classifier, threshold))
+    }
+
+    if ('Collisson' %in% settings$tumor_classifiers) {
+      show.classifier('collisson', 'overview_collisson', result$Tumor$Collisson, 'Collisson', 50)
+    }
+    if ('Moffitt' %in% settings$tumor_classifiers) {
+      show.classifier('moffitt', 'overview_moffitt', result$Tumor$Moffitt, 'Moffitt', 70)
+    }
+    if ('Bailey' %in% settings$tumor_classifiers) {
+      show.classifier('bailey', 'overview_bailey', result$Tumor$Bailey, 'Bailey', 33)
+    }
+    if ('Puleo' %in% settings$tumor_classifiers) {
+      show.classifier('puleo', 'overview_puleo', result$Tumor$Puleo, 'Puleo', 30)
+    }
+    if ('Chan-Seng-Yue' %in% settings$tumor_classifiers) {
+      show.classifier('chan', 'overview_chan', result$Tumor$`Chan-Seng-Yue`, 'Chan-Seng-Yue', 30)
+    }
+    if ('PDAConsensus' %in% settings$tumor_classifiers) {
+      show.classifier('consensus', 'overview_consensus', result$Tumor$PDAConsensus, 'PDAConsensus', 70)
+    }
+
+    if (settings$stroma) {
+      output$proportions <- renderDT(datatable(result$Proportions, class = 'compact hover',
+                                               options = list(pageLength = 25, dom = 'ftip')))
+
+      if ('Moffitt' %in% settings$stroma_classifiers) {
+        show.classifier('moffitt_stroma', 'overview_moffitt_stroma', result$Stroma$Moffitt, 'Stroma Moffitt', 70)
       }
+      if ('Maurer' %in% settings$stroma_classifiers) {
+        show.classifier('maurer_stroma', 'overview_maurer_stroma', result$Stroma$Maurer, 'Stroma Maurer', 70)
+      }
+      if ('PDAConsensus' %in% settings$stroma_classifiers) {
+        show.classifier('consensus_stroma', 'overview_consensus_stroma', result$Stroma$PDAConsensus,
+                        'Stroma PDAConsensus', 70)
+      }
+    }
+
+    if ('Collisson' %in% settings$tumor_classifiers) {
+      shinyjs::enable('downloadCollisson')
+      output$downloadCollisson <- downloadHandler(
+        filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_collisson_classification.csv')},
+        content = function(file) {
+          write.csv(result$Tumor$Collisson, file, row.names = TRUE)
+        }
+      )
+    }
+    if ('Moffitt' %in% settings$tumor_classifiers) {
+      shinyjs::enable('downloadMoffitt')
+      output$downloadMoffitt <- downloadHandler(
+        filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_moffitt_classification.csv')},
+        content = function(file) {
+          write.csv(result$Tumor$Moffitt, file, row.names = TRUE)
+        }
+      )
+    }
+    if ('Bailey' %in% settings$tumor_classifiers) {
+      shinyjs::enable('downloadBailey')
+      output$downloadBailey <- downloadHandler(
+        filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_bailey_classification.csv')},
+        content = function(file) {
+          write.csv(result$Tumor$Bailey, file, row.names = TRUE)
+        }
+      )
+    }
+    if ('Puleo' %in% settings$tumor_classifiers) {
+      shinyjs::enable('downloadPuleo')
+      output$downloadPuleo <- downloadHandler(
+        filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_puleo_classification.csv')},
+        content = function(file) {
+          write.csv(result$Tumor$Puleo, file, row.names = TRUE)
+        }
+      )
+    }
+    if ('Chan-Seng-Yue' %in% settings$tumor_classifiers) {
+      shinyjs::enable('downloadChan-Seng-Yue')
+      output$`downloadChan-Seng-Yue` <- downloadHandler(
+        filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_chan-seng-yue_classification.csv')},
+        content = function(file) {
+          write.csv(result$Tumor$`Chan-Seng-Yue`, file, row.names = TRUE)
+        }
+      )
+    }
+    if ('PDAConsensus' %in% settings$tumor_classifiers) {
+      shinyjs::enable('downloadConsensus')
+      output$downloadConsensus <- downloadHandler(
+        filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_PDAConsensus_classification.csv')},
+        content = function(file) {
+          write.csv(result$Tumor$PDAConsensus, file, row.names = TRUE)
+        }
+      )
+    }
+    
+    if (settings$stroma) {
+      shinyjs::enable('downloadProportions')
+      output$downloadProportions <- downloadHandler(
+        filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_proportions.csv')},
+        content = function(file) {
+          write.csv(result$Proportions, file, row.names = TRUE)
+        }
+      )
       
-      if ('Collisson' %in% input$tumor_classifiers) {
-        output$collisson <- renderDT(datatable(result$Tumor$Collisson,
-                                               options = list(columnDefs = list(list(className = 'dt-center', targets = 1:2)))) %>%
-                                       formatStyle('Probability',
-                                                   backgroundColor = styleInterval(49, c('red', 'default'))))
-        matrix_collisson <- as.matrix(table(result$Tumor$Collisson$Predicted.subtype))
-        colnames(matrix_collisson) <- 'Collisson'
-        output$overview_collisson <- renderTable(matrix_collisson, rownames = TRUE)
-      }
-      if ('Moffitt' %in% input$tumor_classifiers) {
-        output$moffitt <- renderDT(datatable(result$Tumor$Moffitt,
-                                             options = list(columnDefs = list(list(className = 'dt-center', targets = 1:2)))) %>%
-                                     formatStyle('Probability',
-                                                 backgroundColor = styleInterval(69, c('red', 'default'))))
-        matrix_moffitt <- as.matrix(table(result$Tumor$Moffitt$Predicted.subtype))
-        colnames(matrix_moffitt) <- 'Moffitt'
-        output$overview_moffitt <- renderTable(matrix_moffitt, rownames = TRUE)
-      }
-      if ('Bailey' %in% input$tumor_classifiers) {
-        output$bailey <- renderDT(datatable(result$Tumor$Bailey,
-                                            options = list(columnDefs = list(list(className = 'dt-center', targets = 1:2)))) %>%
-                                    formatStyle('Probability',
-                                                backgroundColor = styleInterval(32, c('red', 'default'))))
-        matrix_bailey <- as.matrix(table(result$Tumor$Bailey$Predicted.subtype))
-        colnames(matrix_bailey) <- 'Bailey'
-        output$overview_bailey <- renderTable(matrix_bailey, rownames = TRUE)
-      }
-      if ('Puleo' %in% input$tumor_classifiers) {
-        output$puleo <- renderDT(datatable(result$Tumor$Puleo,
-                                           options = list(columnDefs = list(list(className = 'dt-center', targets = 1:2)))) %>%
-                                   formatStyle('Probability',
-                                               backgroundColor = styleInterval(29, c('red', 'default'))))
-        matrix_puleo <- as.matrix(table(result$Tumor$Puleo$Predicted.subtype))
-        colnames(matrix_puleo) <- 'Puleo'
-        output$overview_puleo <- renderTable(matrix_puleo, rownames = TRUE)
-      }
-      if ('Chan-Seng-Yue' %in% input$tumor_classifiers) {
-        output$chan <- renderDT(datatable(result$Tumor$`Chan-Seng-Yue`,
-                                          options = list(columnDefs = list(list(className = 'dt-center', targets = 1:2)))) %>%
-                                  formatStyle('Probability',
-                                              backgroundColor = styleInterval(29, c('red', 'default'))))
-        matrix_chan <- as.matrix(table(result$Tumor$`Chan-Seng-Yue`$Predicted.subtype))
-        colnames(matrix_chan) <- 'Chan-Seng-Yue'
-        output$overview_chan <- renderTable(matrix_chan, rownames = TRUE)
-      }
-      if ('PDAConsensus' %in% input$tumor_classifiers) {
-        output$consensus <- renderDT(datatable(result$Tumor$PDAConsensus,
-                                               options = list(columnDefs = list(list(className = 'dt-center', targets = 1:3)))) %>%
-                                     formatStyle('Probability',
-                                                   backgroundColor = styleInterval(69, c('red', 'default'))) %>%
-                                     formatRound('NonClassicalScore', 4) %>%
-                                     formatStyle('NonClassicalScore',
-                                                 background = styleColorBar(result$Tumor$PDAConsensus$NonClassicalScore, '#E02438'),
-                                                 backgroundSize = '95% 50%',
-                                                 backgroundRepeat = 'no-repeat',
-                                                 backgroundPosition = 'right'))
-        matrix_consensus <- as.matrix(table(result$Tumor$PDAConsensus$Predicted.subtype))
-        colnames(matrix_consensus) <- 'PDAConsensus'
-        output$overview_consensus <- renderTable(matrix_consensus, rownames = TRUE)
-      }
-      
-      if (input$stroma == 'Yes') {
-        output$proportions <- renderDT(datatable(result$Proportions,
-                                                 options = list(columnDefs = list(list(className = 'dt-center', targets = 1:7)))))
-        
-        if ('Moffitt' %in% input$stroma_classifiers) {
-          output$moffitt_stroma <- renderDT(datatable(result$Stroma$Moffitt,
-                                                      options = list(columnDefs = list(list(className = 'dt-center', targets = 1:2)))) %>%
-                                                      formatStyle('Probability',
-                                                                  backgroundColor = styleInterval(69, c('red', 'default'))))
-          matrix_moffitt_stroma <- as.matrix(table(result$Stroma$Moffitt$Predicted.subtype))
-          colnames(matrix_moffitt_stroma) <- 'Moffitt'
-          output$overview_moffitt_stroma <- renderTable(matrix_moffitt_stroma, rownames = TRUE)
-        }
-        if ('Maurer' %in% input$stroma_classifiers) {
-          output$maurer_stroma <- renderDT(datatable(result$Stroma$Maurer,
-                                                     options = list(columnDefs = list(list(className = 'dt-center', targets = 1:2)))) %>%
-                                             formatStyle('Probability',
-                                                         backgroundColor = styleInterval(69, c('red', 'default'))))
-          matrix_maurer <- as.matrix(table(result$Stroma$Maurer$Predicted.subtype))
-          colnames(matrix_maurer) <- 'Maurer'
-          output$overview_maurer_stroma <- renderTable(matrix_maurer, rownames = TRUE)
-        }
-        if ('PDAConsensus' %in% input$stroma_classifiers) {
-          output$consensus_stroma <- renderDT(datatable(result$Stroma$PDAConsensus,
-                                                        options = list(columnDefs = list(list(className = 'dt-center', targets = 1:3)))) %>%
-                                              formatStyle('Probability',
-                                                          backgroundColor = styleInterval(69, c('red', 'default'))) %>%
-                                              formatRound('ActivatedECMScore', 4) %>%
-                                              formatStyle('ActivatedECMScore',
-                                                          background = styleColorBar(result$Stroma$PDAConsensus$ActivatedECMScore, '#CE18A2'),
-                                                          backgroundSize = '95% 50%',
-                                                          backgroundRepeat = 'no-repeat',
-                                                          backgroundPosition = 'right'))
-          matrix_consensus_stroma <- as.matrix(table(result$Stroma$PDAConsensus$Predicted.subtype))
-          colnames(matrix_consensus_stroma) <- 'PDAConsensus'
-          output$overview_consensus_stroma <- renderTable(matrix_consensus_stroma, rownames = TRUE)
-        }
-      }
-      
-      if ('Collisson' %in% input$tumor_classifiers) {
-        shinyjs::enable('downloadCollisson')
-        output$downloadCollisson <- downloadHandler(
-          filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_collisson_classification.csv')},
+      if ('Moffitt' %in% settings$stroma_classifiers) {
+        shinyjs::enable('downloadMoffittstroma')
+        output$downloadMoffittstroma <- downloadHandler(
+          filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_moffitt_stroma_classification.csv')},
           content = function(file) {
-            write.csv(result$Tumor$Collisson, file, row.names = TRUE)
+            write.csv(result$Stroma$Moffitt, file, row.names = TRUE)
           }
         )
       }
-      if ('Moffitt' %in% input$tumor_classifiers) {
-        shinyjs::enable('downloadMoffitt')
-        output$downloadMoffitt <- downloadHandler(
-          filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_moffitt_classification.csv')},
+      if ('Maurer' %in% settings$stroma_classifiers) {
+        shinyjs::enable('downloadMaurerstroma')
+        output$downloadMaurerstroma <- downloadHandler(
+          filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_maurer_stroma_classification.csv')},
           content = function(file) {
-            write.csv(result$Tumor$Moffitt, file, row.names = TRUE)
+            write.csv(result$Stroma$Maurer, file, row.names = TRUE)
           }
         )
       }
-      if ('Bailey' %in% input$tumor_classifiers) {
-        shinyjs::enable('downloadBailey')
-        output$downloadBailey <- downloadHandler(
-          filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_bailey_classification.csv')},
+      if ('PDAConsensus' %in% settings$stroma_classifiers) {
+        shinyjs::enable('downloadConsensusstroma')
+        output$downloadConsensusstroma <- downloadHandler(
+          filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_PDAConsensus_stroma_classification.csv')},
           content = function(file) {
-            write.csv(result$Tumor$Bailey, file, row.names = TRUE)
+            write.csv(result$Stroma$PDAConsensus, file, row.names = TRUE)
           }
         )
       }
-      if ('Puleo' %in% input$tumor_classifiers) {
-        shinyjs::enable('downloadPuleo')
-        output$downloadPuleo <- downloadHandler(
-          filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_puleo_classification.csv')},
-          content = function(file) {
-            write.csv(result$Tumor$Puleo, file, row.names = TRUE)
-          }
-        )
-      }
-      if ('Chan-Seng-Yue' %in% input$tumor_classifiers) {
-        shinyjs::enable('downloadChan-Seng-Yue')
-        output$`downloadChan-Seng-Yue` <- downloadHandler(
-          filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_chan-seng-yue_classification.csv')},
-          content = function(file) {
-            write.csv(result$Tumor$`Chan-Seng-Yue`, file, row.names = TRUE)
-          }
-        )
-      }
-      if ('PDAConsensus' %in% input$tumor_classifiers) {
-        shinyjs::enable('downloadConsensus')
-        output$downloadConsensus <- downloadHandler(
-          filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_PDAConsensus_classification.csv')},
-          content = function(file) {
-            write.csv(result$Tumor$PDAConsensus, file, row.names = TRUE)
-          }
-        )
-      }
-      
-      if (input$stroma == 'Yes') {
-        shinyjs::enable('downloadProportions')
-        output$downloadProportions <- downloadHandler(
-          filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_proportions.csv')},
-          content = function(file) {
-            write.csv(result$Proportions, file, row.names = TRUE)
-          }
-        )
-        
-        if ('Moffitt' %in% input$stroma_classifiers) {
-          shinyjs::enable('downloadMoffittstroma')
-          output$downloadMoffittstroma <- downloadHandler(
-            filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_moffitt_stroma_classification.csv')},
-            content = function(file) {
-              write.csv(result$Stroma$Moffitt, file, row.names = TRUE)
-            }
-          )
-        }
-        if ('Maurer' %in% input$stroma_classifiers) {
-          shinyjs::enable('downloadMaurerstroma')
-          output$downloadMaurerstroma <- downloadHandler(
-            filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_maurer_stroma_classification.csv')},
-            content = function(file) {
-              write.csv(result$Stroma$Maurer, file, row.names = TRUE)
-            }
-          )
-        }
-        if ('PDAConsensus' %in% input$stroma_classifiers) {
-          shinyjs::enable('downloadConsensusstroma')
-          output$downloadConsensusstroma <- downloadHandler(
-            filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_PDAConsensus_stroma_classification.csv')},
-            content = function(file) {
-              write.csv(result$Stroma$PDAConsensus, file, row.names = TRUE)
-            }
-          )
-        }
-      }
-      
+    }
+  }
+
+  # Background classification: one job per session, polled every second
+  job <- reactiveVal(NULL)
+  run_status <- reactiveVal(list(state = 'idle'))
+  shown_messages <- reactiveVal(0)
+
+  observeEvent(input$runButton, {
+    df <- uploaded()
+    req(df, is.null(job()))
+    settings <- list(batch = input$batch == 'Yes', gene_id = input$gene_id,
+                     tumor_classifiers = input$tumor_classifiers,
+                     stroma = input$stroma == 'Yes', stroma_classifiers = input$stroma_classifiers)
+    args <- list(batch = settings$batch, gene_id = settings$gene_id,
+                 classifier = settings$tumor_classifiers)
+    if (settings$stroma) {
+      args <- c(args, list(stroma = TRUE, stroma_classifier = settings$stroma_classifiers))
+    }
+    lock.controls(TRUE)
+    shown_messages(0)
+    clear.messages('run')
+    new_job <- background.submit(df, args)
+    new_job$settings <- settings
+    job(new_job)
+    run_status(list(state = 'waiting', job = new_job))
   })
-  
+
+  observe({
+    current <- job()
+    req(current)
+    invalidateLater(1000)
+    status <- background.status(current)
+    if (!identical(status$job$started, current$started)) {
+      status$job$settings <- current$settings
+      current <- status$job
+      job(current)
+    }
+
+    # package messages (imputed genes, averaged duplicates...) in the Run card
+    n_shown <- isolate(shown_messages())
+    if (length(status$messages) > n_shown) {
+      for (m in status$messages[(n_shown + 1):length(status$messages)]) {
+        add.message(m, source = 'run')
+      }
+      shown_messages(length(status$messages))
+    }
+
+    if (status$state %in% c('waiting', 'running')) {
+      run_status(list(state = status$state, job = current, progress = status$progress))
+    } else if (status$state == 'done') {
+      result <- background.result(current)
+      background.cleanup(current)
+      job(NULL)
+      lock.controls(FALSE)
+      minutes <- as.numeric(difftime(Sys.time(), current$submitted, units = 'mins'))
+      show.results(result, current$settings)
+      shinyjs::enable('resetButton')
+      record.usage(current$n_samples)
+      run_status(list(state = 'done', minutes = minutes, n_samples = current$n_samples,
+                      progress = status$progress))
+      bslib::nav_select('main_nav', 'Results')
+    } else {
+      message <- background.error(current)
+      background.cleanup(current)
+      job(NULL)
+      lock.controls(FALSE)
+      run_status(list(state = 'error', message = message, progress = status$progress))
+    }
+  })
+
+  observeEvent(input$cancelButton, {
+    current <- job()
+    req(current)
+    background.cancel(current)
+    job(NULL)
+    lock.controls(FALSE)
+    run_status(list(state = 'cancelled', progress = isolate(run_status())$progress))
+  })
+
+  observeEvent(input$goToResults, bslib::nav_select('main_nav', 'Results'))
+
+  # Do not leave processes running when the browser tab is closed
+  session$onSessionEnded(function() {
+    current <- isolate(job())
+    if (!is.null(current)) background.cancel(current)
+  })
+
+  output$run_panel <- renderUI({
+    status <- run_status()
+    df <- uploaded()
+    estimate <- if (!is.null(df)) {
+      estimate.minutes(ncol(df), identical(input$batch, 'Yes'), identical(input$stroma, 'Yes'))
+    }
+    run.panel(status, df, estimate, messages())
+  })
+
   observeEvent(input$resetButton, {
     session$reload()
   })

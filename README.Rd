@@ -36,6 +36,8 @@
   It contains the following files:
   \itemize{
   
+    \item install: conda environment and installer (see Installation).
+
     \item inst:
       \itemize{
         \item examples: it contains a R script (`example.R`) with some examples.
@@ -78,108 +80,48 @@
 }
 
 \section{Installation}{
-
-  To install the \pkg{PDACMOC} package, we recommend to create a Miniconda environment following the next instructions.
-
+  \pkg{PDACMOC} runs on Linux and needs conda (Miniforge or Miniconda, \url{https://conda-forge.org/download/}).
+  The installer creates a conda environment called \code{pdacmoc} with R, Python and all the dependencies:
   \preformatted{
-  
-    ## Download and uncompressed the distribution file
-    wget https://github.com/pavillos/PDACMOC/releases/download/v.2.5.5/PDACMOC_2.5.5.tar.gz
-    tar -xvzf PDACMOC_2.5.5.tar.gz
-    
-    ## Install Miniconda
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-    bash Miniconda3-latest-Linux-x86_64.sh
-    rm Miniconda3-latest-Linux-x86_64.sh
-    
-    ## Close and open terminal
-    
-    ## Update conda
-    conda update conda
-    
-    ## Create conda environment
-    conda create -n PDACMOC
+wget https://github.com/pavillos/PDACMOC/releases/download/v.2.6.0/PDACMOC_2.6.0.tar.gz
+tar -xzf PDACMOC_2.6.0.tar.gz
+bash PDACMOC/install/install.sh PDACMOC_2.6.0.tar.gz
+  }
+  To use it, run \code{conda activate pdacmoc}, open R and load the package, pointing \pkg{reticulate}
+  to the Python of the environment (the installer prints its path):
+  \preformatted{
+reticulate::use_python('~/miniconda3/envs/pdacmoc/bin/python', required = TRUE)
+library(PDACMOC)
+  }
+  The environment pins scikit-learn 1.3.1 and org.Hs.eg.db 3.18.0, the versions the published models
+  were built with: newer versions change the classification. Do not update them by hand.
+}
 
-    ## Activate conda environment
-    conda activate PDACMOC
-    
-    ## Add conda-forge and bioconda channels
-    conda config --env --add channels conda-forge
-    conda config --env --add channels bioconda
-    
-    ## Install Python
-    conda install python=3.11.4
-    
-    ## Install Python modules
-    pip3 install numpy pandas pickle-mixin scikit-learn==1.3.1 
-    
-    ## Install R
-    conda install -c conda-forge r-base=4.4.0
-    
-    ## Install libuv, libcurl, and libxml2
-    conda install -c conda-forge libuv
-    conda install -c conda-forge libcurl
-    conda install -c conda-forge libxml2
-    
-    ## Change PKG_CONFIG_PATH
-    # change path to your miniconda3 environment
-    export PKG_CONFIG_PATH="/home/pvilloslada/Software/miniconda3/envs/PDACMOC/lib/pkgconfig/:$PKG_CONFIG_PATH" 
-    
-    ## Open R
-    R
-    
-    ## Install R packages
-    options(repos = c(CRAN = 'https://cloud.r-project.org/'))
-
-    install.packages(c('BiocManager', 'doMC', 'dplyr', 'DT', 'foreach',
-                       'iterators', 'mclust', 'plyr', 'reticulate', 'scales', 
-                       'shiny', 'shinydashboard', 'shinyjs', 'shinythemes'))
-    BiocManager::install(c('AnnotationDbi', 'DESeq2', 'org.Hs.eg.db', 'sva'))
-    
-    ## Close R
-    q()
-                                
-    ## Install ADVOCATE
-    R CMD INSTALL ./PDACMOC/inst/packages/ADVOCATE_0.1.0.1.tar.gz
-
-    ## Install PDACMOC
-    R CMD INSTALL ./PDACMOC_2.5.5.tar.gz
-    
-    ## Open R
-    R
-    
-    ## Check if PDACMOC can be loaded
-    library(PDACMOC)
-    
-    ## Close R
-    q()
-    
+\section{Classifying your own files from R}{
+  \code{read.counts()} reads a file of raw counts the same way the Shiny app does: it accepts
+  .tsv, .csv and .txt files, detects the separator and averages rows with duplicated gene IDs.
+  \preformatted{
+library(PDACMOC)
+counts <- read.counts('my_counts.csv')
+classification <- omni.classify(counts, gene_id = 'EnsemblID')
   }
 }
 
 \section{Shiny app instructions}{
-  You can access the Shiny app online at \url{https://pdacmoc.cnio.es/}.
-  
-  To run the program online:
+  Use it online at \url{https://pdacmoc.cnio.es/}, or on your computer with \code{runPDACMOC()}.
   \enumerate{
-    \item Connect to server.
-    \item Upload a tsv file with genes in rows and samples in columns (max. 1GB).
-    \item Select if you want to apply or not batch correction.
-    \item Select the gene ID type.
-    \item Select one or more tumor classifiers.
-    \item Select if you want to include or not stroma classification.
-    \item If you want to include stroma classification, select one or more stroma classifiers.
-    \item Press 'Run classification' and wait about 15-20 minutes.
-    \item If you want to upload another tsv file press 'Reset app'.
+    \item Upload a .tsv or .csv file of raw counts with genes in rows and samples in columns (max. 1GB).
+    \item Choose batch correction, the gene ID type, the tumor classifiers and, optionally, the stroma classifiers.
+    \item Press 'Run classification'. The Run card shows the progress, the estimated time and any message about your file; you can cancel at any time.
+    \item When it finishes, the app opens the results. Press 'New classification' to classify another file.
   }
-  
+
   After the process you will find the following:
   \enumerate{
-    \item Table of tumor/stroma proportions. 'E' stands for epithelium, 'S' stands for stroma, and 'O' stands for others. 'conf' refers to 95\% confidence intervals.
-    \item Up to 6 tables of tumor classification.
-    \item Up to 6 summary tables of tumor classification.
-    \item Up to 3 tables of stroma classification.
-    \item Up to 3 summary tables of stroma classification.
+    \item In the Results tab, one table per classifier with the predicted subtype (in the colours used in the paper), its probability and a flag when the probability is below the threshold of that classifier (low confidence). \emph{PDAConsensus} tables also show the NonClassicalScore or ActivatedECMScore.
+    \item In the Results tab, the table of tumor/stroma proportions (only with stroma classification). 'E' stands for epithelium, 'S' stands for stroma, and 'O' stands for others. 'conf' refers to 95\% confidence intervals.
+    \item In the Summary tab, the number of samples assigned to each subtype for every classifier.
+    \item In the Performance tab, the published balanced accuracy of every classifier.
   }
 }
 
@@ -260,7 +202,7 @@
   rm(file1)
 
   # change path to your miniconda3 environment
-  reticulate::use_python("~/Software/miniconda3/envs/PDACMOC/bin/python3.11", required = TRUE)
+  reticulate::use_python('~/miniconda3/envs/pdacmoc/bin/python', required = TRUE)
 
   file2 <- system.file('training_data', 'all_datasets_corrected.csv', package = 'PDACMOC')
 

@@ -43,6 +43,7 @@ omni.classify <- function(expmat, batch = TRUE, gene_id = 'EnsemblID',
                           classifier = c('Collisson', 'Moffitt', 'Bailey',
                                          'Puleo', 'Chan-Seng-Yue', 'PDAConsensus'),
                           stroma = FALSE, stroma_classifier = '') {
+  report.progress('Classification started', 0)
   if (shiny::isRunning()) {withProgress(message = 'Classification started', value = 0, {Sys.sleep(3)})}
   
   if (any(!classifier %in% c('Collisson', 'Moffitt', 'Bailey',
@@ -68,6 +69,7 @@ omni.classify <- function(expmat, batch = TRUE, gene_id = 'EnsemblID',
   }
   
   # Import data
+  report.progress('Importing samples', 0.1)
   if (shiny::isRunning()) {
     withProgress(message = 'Importing samples', value = 0.1, {
       new_samples <- import.and.normalize(expmat, batch, gene_id)
@@ -76,6 +78,7 @@ omni.classify <- function(expmat, batch = TRUE, gene_id = 'EnsemblID',
   
   # Get virtual microdissection if stroma classification is selected
   if (stroma == TRUE) {
+    report.progress('Virtual microdissection. This may take a while...', 0.4)
     if (shiny::isRunning()) {
       withProgress(message = 'Virtual microdissection. This may take a while...', value = 0.4, {
         vm_result <- virtual.microdissect(new_samples)
@@ -87,31 +90,37 @@ omni.classify <- function(expmat, batch = TRUE, gene_id = 'EnsemblID',
   
   # Classify tumor samples
   if ('Collisson' %in% classifier) {
+    report.progress('Collisson classification', 0.9)
     if (shiny::isRunning()) {withProgress(message = 'Collisson classification', value = 0.9, {Sys.sleep(3)})}
     results_collisson <- collisson.classify(new_samples)
   }
   
   if ('Moffitt' %in% classifier) {
+    report.progress('Moffitt classification', 0.9)
     if (shiny::isRunning()) {withProgress(message = 'Moffitt classification', value = 0.9, {Sys.sleep(3)})}
     results_moffitt <- moffitt.classify(new_samples)
   }
   
   if ('Bailey' %in% classifier) {
+    report.progress('Bailey classification', 0.9)
     if (shiny::isRunning()) {withProgress(message = 'Bailey classification', value = 0.9, {Sys.sleep(3)})}
     results_bailey <- bailey.classify(new_samples)
   }
   
   if ('Puleo' %in% classifier) {
+    report.progress('Puleo classification', 0.9)
     if (shiny::isRunning()) {withProgress(message = 'Puleo classification', value = 0.9, {Sys.sleep(3)})}
     results_puleo <- puleo.classify(new_samples)
   }
   
   if ('Chan-Seng-Yue' %in% classifier) {
+    report.progress('Chan-Seng-Yue classification', 0.9)
     if (shiny::isRunning()) {withProgress(message = 'Chan-Seng-Yue classification', value = 0.9, {Sys.sleep(3)})}
     results_chan <- chan.classify(new_samples)
   }
   
   if ('PDAConsensus' %in% classifier) {
+    report.progress('PDAConsensus classification', 0.9)
     if (shiny::isRunning()) {withProgress(message = 'PDAConsensus classification', value = 0.9, {Sys.sleep(3)})}
     results_consensus <- PDAConsensus.classify(new_samples)
   }
@@ -149,14 +158,17 @@ omni.classify <- function(expmat, batch = TRUE, gene_id = 'EnsemblID',
     rm(results_tumor)
     
     if ('Moffitt' %in% stroma_classifier) {
+      report.progress('Moffitt stroma classification', 0.95)
       if (shiny::isRunning()) {withProgress(message = 'Moffitt stroma classification', value = 0.95, {Sys.sleep(3)})}
       results_stroma_moffitt <- stroma.moffitt.classify(vm_result$vm_S)
     }
     if ('Maurer' %in% stroma_classifier) {
+      report.progress('Maurer stroma classification', 0.95)
       if (shiny::isRunning()) {withProgress(message = 'Maurer stroma classification', value = 0.95, {Sys.sleep(3)})}
       results_stroma_maurer <- stroma.maurer.classify(vm_result$vm_S)
     }
     if ('PDAConsensus' %in% stroma_classifier) {
+      report.progress('PDAConsensus stroma classification', 0.95)
       if (shiny::isRunning()) {withProgress(message = 'PDAConsensus stroma classification', value = 0.95, {Sys.sleep(3)})}
       results_stroma_consensus <- stroma.PDAConsensus.classify(vm_result$vm_S)
     }
@@ -181,6 +193,7 @@ omni.classify <- function(expmat, batch = TRUE, gene_id = 'EnsemblID',
     rm(results_tumor)
   }
   
+  report.progress('Classification finished', 1)
   if (shiny::isRunning()) {withProgress(message = 'Classification finished', value =1, {Sys.sleep(3)})}
   
   return(classification)
