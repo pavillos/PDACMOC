@@ -1,3 +1,11 @@
+# PDACMOC 2.6.2
+
+Documentation only. The package and the classification results are identical to 2.6.0.
+
+* The citation badges read the counts stored daily by the metrics workflow, since
+  Europe PMC often did not answer the badge service in time ("inaccessible").
+* The row names of the badges are aligned with the badges.
+
 # PDACMOC 2.6.1
 
 Documentation only. The package and the classification results are identical to 2.6.0.
