@@ -88,9 +88,9 @@ It contains the following files:
 PDACMOC runs on Linux and needs [conda](https://conda-forge.org/download/) (Miniforge or Miniconda). The installer creates a conda environment called `pdacmoc` with R, Python and all the dependencies:
 
 ```sh
-wget https://github.com/pavillos/PDACMOC/releases/download/v.2.6.2/PDACMOC_2.6.2.tar.gz
-tar -xzf PDACMOC_2.6.2.tar.gz
-bash PDACMOC/install/install.sh PDACMOC_2.6.2.tar.gz
+wget https://github.com/pavillos/PDACMOC/releases/download/v.2.6.3/PDACMOC_2.6.3.tar.gz
+tar -xzf PDACMOC_2.6.3.tar.gz
+bash PDACMOC/install/install.sh PDACMOC_2.6.3.tar.gz
 ```
 
 To use it, run `conda activate pdacmoc`, open R and load the package, pointing `reticulate` to the Python of the environment (the installer prints its path):

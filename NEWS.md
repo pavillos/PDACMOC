@@ -1,3 +1,13 @@
+# PDACMOC 2.6.3
+
+Shiny app only. The classification results are identical to 2.6.0.
+
+* The Help tab has a 'Use and citations' card with the citations of the article and the
+  preprint, the downloads from GitHub and Zenodo, the use of the app and the license, from
+  the same sources as the README badges.
+* The footer shows how many classifications and samples the app has run, where the usage
+  counter is on (the public server).
+
 # PDACMOC 2.6.2
 
 Documentation only. The package and the classification results are identical to 2.6.0.

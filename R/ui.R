@@ -14,6 +14,20 @@ result.tab <- function(title, output_id, download_id, download_label, note = NUL
 
 section.title <- function(...) div(class = 'section-title', ...)
 
+# Metrics shown in Help, from the same sources as the README badges
+gist_json <- 'https://gist.githubusercontent.com/pavillos/e55b1802a1ed7b3b815189d7e0c0b802/raw/traffic.json'
+zenodo_json <- 'https://zenodo.org/api/records/17019896'
+usage_json <- 'https://pdacmoc.cnio.es/stats/usage.json'
+
+metric.badge <- function(alt, json, query, label, colour, href) {
+  src <- paste0('https://img.shields.io/badge/dynamic/json?url=', utils::URLencode(json, reserved = TRUE),
+                '&query=', utils::URLencode(query, reserved = TRUE),
+                '&label=', utils::URLencode(label, reserved = TRUE), '&color=', colour)
+  tags$a(href = href, target = '_blank', tags$img(alt = alt, src = src))
+}
+
+metric.row <- function(name, ...) div(class = 'metric-row', span(class = 'metric-name', name), ...)
+
 threshold.note <- function(threshold) {
   paste0('The probability is how sure the classifier is of the subtype it assigns. Below ',
          threshold, '% the sample is flagged as low confidence: read it as undetermined rather ',
@@ -182,6 +196,11 @@ ui <- bslib::page_navbar(
       .help-block h3 { font-size: 1rem; margin-top: 1.1rem; }
       .help-block h3:first-child { margin-top: 0; }
       .help-block p, .help-block li { font-size: .9rem; color: var(--bs-secondary-color); }
+
+      .metric-row { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin-bottom: .55rem; }
+      .metric-name { font-size: .85rem; font-weight: 600; min-width: 5.5rem; }
+      .metric-row img { display: block; height: 20px; }
+      .usage-line { text-align: center; font-size: .78rem; color: var(--bs-secondary-color); margin-top: .7rem; }
 
       .app-footer { border-top: 1px solid var(--bs-border-color); margin-top: auto; padding: 1.1rem 0 1.4rem; }
       .app-footer::before { content: ''; display: block; height: 0; }
@@ -366,6 +385,30 @@ ui <- bslib::page_navbar(
                      'github.com/pavillos/PDACMOC')),
             p(strong('Contact: '),
               tags$a(href = 'mailto:pvilloslada@cnio.es', 'pvilloslada@cnio.es')))
+      )),
+      bslib::card(bslib::card_header('Use and citations'), bslib::card_body(
+        div(class = 'help-block',
+            metric.row('Citations',
+                       metric.badge('Citations of the article', gist_json, '$.citations.article',
+                                    'Genome Medicine', '6B2E99', 'https://europepmc.org/article/MED/41239365'),
+                       metric.badge('Citations of the preprint', gist_json, '$.citations.preprint',
+                                    'bioRxiv', 'B8925A', 'https://europepmc.org/article/PPR/PPR987525')),
+            metric.row('Downloads',
+                       tags$a(href = 'https://github.com/pavillos/PDACMOC/releases', target = '_blank',
+                              tags$img(alt = 'Downloads from GitHub', src = paste0(
+                                'https://img.shields.io/github/downloads/pavillos/PDACMOC/total',
+                                '?label=GitHub&color=24292F'))),
+                       metric.badge('Downloads from Zenodo', zenodo_json, '$.stats.downloads',
+                                    'Zenodo', '185C84', 'https://doi.org/10.5281/zenodo.17019896')),
+            metric.row('This app',
+                       metric.badge('Classifications', usage_json, '$.classifications',
+                                    'classifications since Sep 2026', '6B2E99', 'https://pdacmoc.cnio.es'),
+                       metric.badge('Samples classified', usage_json, '$.samples',
+                                    'samples classified since Sep 2026', '6B2E99', 'https://pdacmoc.cnio.es')),
+            metric.row('License',
+                       tags$a(href = 'https://github.com/pavillos/PDACMOC/blob/main/LICENSE', target = '_blank',
+                              tags$img(alt = 'License: CC BY-NC 4.0',
+                                       src = 'https://img.shields.io/badge/CC%20BY--NC%204.0-lightgrey'))))
       ))
     )
   ),
@@ -382,6 +425,7 @@ ui <- bslib::page_navbar(
     class = 'app-footer',
     div(class = 'logo-row',
         imageOutput('pdacmoc_logo', width = 'auto', height = '54px', inline = TRUE),
-        imageOutput('pdaconsensus_logo', width = 'auto', height = '26px', inline = TRUE))
+        imageOutput('pdaconsensus_logo', width = 'auto', height = '26px', inline = TRUE)),
+    uiOutput('usage_line')
   )
 )

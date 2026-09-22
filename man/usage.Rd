@@ -4,11 +4,14 @@
 \alias{usage}
 \alias{read.usage}
 \alias{record.usage}
+\alias{usage.sentence}
 \title{Usage counter of the Shiny app}
 \usage{
 read.usage(file)
 
 record.usage(n_samples, file = usage.file())
+
+usage.sentence(file = usage.file())
 }
 \arguments{
 \item{file}{Path of usage.json}
@@ -28,6 +31,8 @@ the app serves read-only at \code{/stats/usage.json}.
 \item \code{read.usage()}: Current totals (zero when the file does not exist yet)
 
 \item \code{record.usage()}: Add one finished classification of \code{n_samples} samples
+
+\item \code{usage.sentence()}: Sentence for the footer of the app, or NULL when the counter is off
 
 }}
 \author{

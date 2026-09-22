@@ -337,5 +337,12 @@ server <- function(input, output, session) {
   observeEvent(input$resetButton, {
     session$reload()
   })
+
+  # Usage of the app in the footer (only where the counter is on)
+  output$usage_line <- renderUI({
+    invalidateLater(60000)
+    sentence <- usage.sentence()
+    if (!is.null(sentence)) div(class = 'usage-line', sentence)
+  })
   
 }

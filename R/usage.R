@@ -62,6 +62,17 @@ write.usage <- function(usage, file) {
   file.rename(paste0(file, '.tmp'), file)
 }
 
+#' @describeIn usage Sentence for the footer of the app, or NULL when the counter is off
+usage.sentence <- function(file = usage.file()) {
+  if (is.null(file) || !file.exists(file)) return(NULL)
+  usage <- tryCatch(read.usage(file), error = function(e) NULL)
+  if (is.null(usage)) return(NULL)
+  since <- tryCatch(format(as.Date(usage$since), '%B %Y'), error = function(e) usage$since)
+  plural <- function(n, word) sprintf('%s %s%s', format(n, big.mark = ','), word, if (n == 1) '' else 's')
+  sprintf('Used for %s (%s) since %s', plural(usage$classifications, 'classification'),
+          plural(usage$samples, 'sample'), since)
+}
+
 # Serve the stats folder at /stats (only usage.json is written there)
 serve.usage <- function() {
   dir <- getOption('PDACMOC.stats_dir')
