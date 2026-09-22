@@ -1,3 +1,14 @@
+# PDACMOC 2.6.4
+
+Shiny app only. The classification results are identical to 2.6.0.
+
+* 'Download all (zip)' in the Results tab: all the result tables, with the same content and
+  file names as the single downloads, and the summary figure.
+* 'Download summary (PNG)' in the Summary tab: the number of samples per subtype of every
+  classifier, in the colours of the paper, with the low-confidence counts.
+* The number of classifications and samples run by the app moves from the footer to the
+  'Use and citations' card of the Help tab.
+
 # PDACMOC 2.6.3
 
 Shiny app only. The classification results are identical to 2.6.0.

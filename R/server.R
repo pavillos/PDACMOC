@@ -238,6 +238,50 @@ server <- function(input, output, session) {
         )
       }
     }
+
+    # The Summary tab as a figure, and all the downloads in one zip
+    figure <- summary.plot(result, settings)
+    save.figure <- function(file) {
+      ggsave(file, figure$plot, width = figure$width, height = figure$height, dpi = 200, bg = 'white')
+    }
+    shinyjs::enable('downloadSummary')
+    output$downloadSummary <- downloadHandler(
+      filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_summary.png')},
+      content = save.figure
+    )
+    # same tables and file names as the single downloads
+    tables <- list(collisson_classification = result$Tumor$Collisson,
+                   moffitt_classification = result$Tumor$Moffitt,
+                   bailey_classification = result$Tumor$Bailey,
+                   puleo_classification = result$Tumor$Puleo,
+                   `chan-seng-yue_classification` = result$Tumor$`Chan-Seng-Yue`,
+                   PDAConsensus_classification = result$Tumor$PDAConsensus)
+    if (settings$stroma) {
+      tables <- c(tables, list(proportions = result$Proportions,
+                               moffitt_stroma_classification = result$Stroma$Moffitt,
+                               maurer_stroma_classification = result$Stroma$Maurer,
+                               PDAConsensus_stroma_classification = result$Stroma$PDAConsensus))
+    }
+    tables <- tables[!vapply(tables, is.null, logical(1))]
+    shinyjs::enable('downloadAll')
+    output$downloadAll <- downloadHandler(
+      filename = function() {paste0(format(Sys.Date(), '%y%m%d'), '_PDACMOC_results.zip')},
+      content = function(file) {
+        dir <- tempfile('pdacmoc_download_')
+        dir.create(dir)
+        on.exit(unlink(dir, recursive = TRUE))
+        prefix <- format(Sys.Date(), '%y%m%d')
+        for (name in names(tables)) {
+          write.csv(tables[[name]], file.path(dir, paste0(prefix, '_', name, '.csv')), row.names = TRUE)
+        }
+        save.figure(file.path(dir, paste0(prefix, '_summary.png')))
+        # conda R sets R_ZIPCMD to an empty string: fall back to the system zip
+        zip_command <- Sys.getenv('R_ZIPCMD')
+        if (!nzchar(zip_command)) zip_command <- 'zip'
+        utils::zip(file, list.files(dir, full.names = TRUE), flags = '-j -q', zip = zip_command)
+      },
+      contentType = 'application/zip'
+    )
   }
 
   # Background classification: one job per session, polled every second

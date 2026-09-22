@@ -200,7 +200,9 @@ ui <- bslib::page_navbar(
       .metric-row { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin-bottom: .55rem; }
       .metric-name { font-size: .85rem; font-weight: 600; min-width: 5.5rem; }
       .metric-row img { display: block; height: 20px; }
-      .usage-line { text-align: center; font-size: .78rem; color: var(--bs-secondary-color); margin-top: .7rem; }
+      .usage-line { font-size: .85rem; color: var(--bs-secondary-color); margin-top: .8rem; }
+      .download-all { display: flex; justify-content: flex-end; align-items: center; gap: .9rem; flex-wrap: wrap; margin: .2rem 0 .8rem; }
+      .download-all .helper { margin: 0; }
 
       .app-footer { border-top: 1px solid var(--bs-border-color); margin-top: auto; padding: 1.1rem 0 1.4rem; }
       .app-footer::before { content: ''; display: block; height: 0; }
@@ -261,6 +263,9 @@ ui <- bslib::page_navbar(
 
   bslib::nav_panel(
     'Results',
+    div(class = 'download-all',
+        span(class = 'helper', 'All the tables and the summary figure in one zip file.'),
+        downloadButton('downloadAll', 'Download all (zip)', class = 'btn-primary', disabled = TRUE)),
     bslib::navset_card_tab(
       full_screen = FALSE,
       result.tab('Collisson', 'collisson', 'downloadCollisson',
@@ -314,7 +319,9 @@ ui <- bslib::page_navbar(
       bslib::card(bslib::card_header('Maurer'), bslib::card_body(uiOutput('overview_maurer_stroma'))),
       bslib::card(bslib::card_header(pdaconsensus.label()), bslib::card_body(uiOutput('overview_consensus_stroma')))
     ),
-    div(class = 'helper', 'Number of samples assigned to each subtype, in the colours of the paper. Filled in when a classification finishes.')
+    div(class = 'helper', 'Number of samples assigned to each subtype, in the colours of the paper. Filled in when a classification finishes.'),
+    div(class = 'result-actions',
+        downloadButton('downloadSummary', 'Download summary (PNG)', class = 'btn-primary', disabled = TRUE))
   ),
 
   bslib::nav_panel(
@@ -408,7 +415,8 @@ ui <- bslib::page_navbar(
             metric.row('License',
                        tags$a(href = 'https://github.com/pavillos/PDACMOC/blob/main/LICENSE', target = '_blank',
                               tags$img(alt = 'License: CC BY-NC 4.0',
-                                       src = 'https://img.shields.io/badge/CC%20BY--NC%204.0-lightgrey'))))
+                                       src = 'https://img.shields.io/badge/CC%20BY--NC%204.0-lightgrey'))),
+            uiOutput('usage_line'))
       ))
     )
   ),
@@ -425,7 +433,6 @@ ui <- bslib::page_navbar(
     class = 'app-footer',
     div(class = 'logo-row',
         imageOutput('pdacmoc_logo', width = 'auto', height = '54px', inline = TRUE),
-        imageOutput('pdaconsensus_logo', width = 'auto', height = '26px', inline = TRUE)),
-    uiOutput('usage_line')
+        imageOutput('pdaconsensus_logo', width = 'auto', height = '26px', inline = TRUE))
   )
 )
