@@ -1,9 +1,9 @@
 cff-version: 1.2.0
 message: "If you use this software or dataset, please cite it as follows."
 title: "PDACMOC: PDACMolecularOmniClassifier"
-version: "2.6.0"
+version: "2.6.1"
 doi: "10.5281/zenodo.17019896"
-date-released: "2026-09-21"
+date-released: "2026-09-22"
 license: "CC-BY-NC-4.0"
 authors:
   - family-names: "Villoslada-Blanco"

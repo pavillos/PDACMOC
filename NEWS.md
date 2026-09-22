@@ -1,3 +1,12 @@
+# PDACMOC 2.6.1
+
+Documentation only. The package and the classification results are identical to 2.6.0.
+
+* The README metric badges are grouped by source (GitHub, citations, Shiny app, Zenodo)
+  and include the citations of the bioRxiv preprint.
+* The example script (`inst/examples/example.R`), the README and the help pages show the
+  same example again, pointing `reticulate` to the Python of the `pdacmoc` environment.
+
 # PDACMOC 2.6.0
 
 New Shiny app and simpler installation. Classification results are identical to 2.5.5.

@@ -13,17 +13,27 @@
 [![Zenodo](https://img.shields.io/badge/Zenodo-10.5281/zenodo.17019896-185C84)](https://doi.org/10.5281/zenodo.17019896)
 [![bioRxiv](https://img.shields.io/badge/bioRxiv-10.1101/2025.03.06.641837-B8925A)](https://doi.org/10.1101/2025.03.06.641837)
 
-[![Release](https://img.shields.io/github/v/release/pavillos/PDACMOC?label=release&color=185C84)](https://github.com/pavillos/PDACMOC/releases/latest)
-[![Package downloads](https://img.shields.io/github/downloads/pavillos/PDACMOC/total?label=package%20downloads&color=185C84)](https://github.com/pavillos/PDACMOC/releases)
-[![Downloads of the latest release](https://img.shields.io/github/downloads/pavillos/PDACMOC/latest/total?label=downloads%40latest&color=185C84)](https://github.com/pavillos/PDACMOC/releases/latest)
-[![Zenodo downloads](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fzenodo.org%2Fapi%2Frecords%2F17019896&query=%24.stats.downloads&label=Zenodo%20downloads&color=185C84)](https://doi.org/10.5281/zenodo.17019896)
-[![Zenodo views](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fzenodo.org%2Fapi%2Frecords%2F17019896&query=%24.stats.views&label=Zenodo%20views&color=185C84)](https://doi.org/10.5281/zenodo.17019896)
-[![Citations](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.ebi.ac.uk%2Feuropepmc%2Fwebservices%2Frest%2Fsearch%3Fquery%3DDOI%3A10.1186%2Fs13073-025-01568-9%26format%3Djson%26resultType%3Dcore&query=%24.resultList.result%5B0%5D.citedByCount&label=citations&color=6B2E99)](https://doi.org/10.1186/s13073-025-01568-9)
-[![GitHub clones](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgist.githubusercontent.com%2Fpavillos%2Fe55b1802a1ed7b3b815189d7e0c0b802%2Fraw%2Ftraffic.json&query=%24.clones&label=GitHub%20clones%20since%20Sep%202026&color=185C84)](https://github.com/pavillos/PDACMOC)
-[![GitHub views](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgist.githubusercontent.com%2Fpavillos%2Fe55b1802a1ed7b3b815189d7e0c0b802%2Fraw%2Ftraffic.json&query=%24.views&label=GitHub%20views%20since%20Sep%202026&color=185C84)](https://github.com/pavillos/PDACMOC)
-[![Shiny classifications](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdacmoc.cnio.es%2Fstats%2Fusage.json&query=%24.classifications&label=Shiny%20classifications&color=6B2E99)](https://pdacmoc.cnio.es)
-[![Samples classified in the Shiny app](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdacmoc.cnio.es%2Fstats%2Fusage.json&query=%24.samples&label=samples%20classified&color=6B2E99)](https://pdacmoc.cnio.es)
-[![License: CC BY-NC 4.0](https://img.shields.io/badge/license-CC%20BY--NC%204.0-lightgrey)](LICENSE)
+**GitHub**&nbsp;
+[![Latest release](https://img.shields.io/github/v/release/pavillos/PDACMOC?label=release&color=24292F)](https://github.com/pavillos/PDACMOC/releases/latest)
+[![Downloads of all versions](https://img.shields.io/github/downloads/pavillos/PDACMOC/total?label=downloads%20%28all%20versions%29&color=24292F)](https://github.com/pavillos/PDACMOC/releases)
+[![Downloads of the latest version](https://img.shields.io/github/downloads/pavillos/PDACMOC/latest/total?label=downloads%20%28latest%20version%29&color=24292F)](https://github.com/pavillos/PDACMOC/releases/latest)
+[![Clones](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgist.githubusercontent.com%2Fpavillos%2Fe55b1802a1ed7b3b815189d7e0c0b802%2Fraw%2Ftraffic.json&query=%24.clones&label=clones%20since%20Sep%202026&color=24292F)](https://github.com/pavillos/PDACMOC)
+[![Views](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgist.githubusercontent.com%2Fpavillos%2Fe55b1802a1ed7b3b815189d7e0c0b802%2Fraw%2Ftraffic.json&query=%24.views&label=views%20since%20Sep%202026&color=24292F)](https://github.com/pavillos/PDACMOC)
+
+**Citations**&nbsp;
+[![Citations of the article](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.ebi.ac.uk%2Feuropepmc%2Fwebservices%2Frest%2Fsearch%3Fquery%3DDOI%3A10.1186%2Fs13073-025-01568-9%26format%3Djson%26resultType%3Dcore&query=%24.resultList.result%5B0%5D.citedByCount&label=Genome%20Medicine&color=6B2E99)](https://europepmc.org/article/MED/41239365)
+[![Citations of the preprint](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.ebi.ac.uk%2Feuropepmc%2Fwebservices%2Frest%2Fsearch%3Fquery%3DDOI%3A10.1101%2F2025.03.06.641837%26format%3Djson%26resultType%3Dcore&query=%24.resultList.result%5B0%5D.citedByCount&label=bioRxiv&color=B8925A)](https://europepmc.org/article/PPR/PPR987525)
+
+**Shiny app**&nbsp;
+[![Classifications](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdacmoc.cnio.es%2Fstats%2Fusage.json&query=%24.classifications&label=classifications%20since%20Sep%202026&color=6B2E99)](https://pdacmoc.cnio.es)
+[![Samples classified](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpdacmoc.cnio.es%2Fstats%2Fusage.json&query=%24.samples&label=samples%20classified%20since%20Sep%202026&color=6B2E99)](https://pdacmoc.cnio.es)
+
+**Zenodo**&nbsp;
+[![Downloads](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fzenodo.org%2Fapi%2Frecords%2F17019896&query=%24.stats.downloads&label=downloads&color=185C84)](https://doi.org/10.5281/zenodo.17019896)
+[![Views](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fzenodo.org%2Fapi%2Frecords%2F17019896&query=%24.stats.views&label=views&color=185C84)](https://doi.org/10.5281/zenodo.17019896)
+
+**License**&nbsp;
+[![CC BY-NC 4.0](https://img.shields.io/badge/CC%20BY--NC%204.0-lightgrey)](LICENSE)
 
 This package classifies tumor samples according to several molecular classifiers available using different Machine Learning (ML) approaches. It classifies both tumor and stroma fractions. To classify stroma compartment, it first makes a virtual microdissection through the `ADVOCATE` package.
 
@@ -77,9 +87,9 @@ It contains the following files:
 PDACMOC runs on Linux and needs [conda](https://conda-forge.org/download/) (Miniforge or Miniconda). The installer creates a conda environment called `pdacmoc` with R, Python and all the dependencies:
 
 ```sh
-wget https://github.com/pavillos/PDACMOC/releases/download/v.2.6.0/PDACMOC_2.6.0.tar.gz
-tar -xzf PDACMOC_2.6.0.tar.gz
-bash PDACMOC/install/install.sh PDACMOC_2.6.0.tar.gz
+wget https://github.com/pavillos/PDACMOC/releases/download/v.2.6.1/PDACMOC_2.6.1.tar.gz
+tar -xzf PDACMOC_2.6.1.tar.gz
+bash PDACMOC/install/install.sh PDACMOC_2.6.1.tar.gz
 ```
 
 To use it, run `conda activate pdacmoc`, open R and load the package, pointing `reticulate` to the Python of the environment (the installer prints its path):
@@ -221,18 +231,18 @@ results_stroma_maurer <- PDACMOC:::stroma.maurer.classify(vm_result$vm_S)
 
 results_stroma_consensus <- PDACMOC:::stroma.PDAConsensus.classify(vm_result$vm_S)
 
-classification_tumor <- PDACMOC:::omni.classify(samples, batch = FALSE, gene_id = 'EnsemblID',
-                                                  classifier = c('Collisson', 'Moffitt', 'Bailey',
-                                                                 'Puleo', 'Chan-Seng-Yue', 'PDAConsensus'))
+classification_tumor <- PDACMOC::omni.classify(samples, batch = FALSE, gene_id = 'EnsemblID',
+                                               classifier = c('Collisson', 'Moffitt', 'Bailey',
+                                                              'Puleo', 'Chan-Seng-Yue', 'PDAConsensus'))
 
-classification_all <- PDACMOC:::omni.classify(samples, batch = FALSE, gene_id = 'EnsemblID',
-                                              classifier = c('Collisson', 'Moffitt', 'Bailey',
-                                                             'Puleo', 'Chan-Seng-Yue', 'PDAConsensus'),
-                                              stroma = TRUE,
-                                              stroma_classifier = c('Moffitt',
-                                                                    'Maurer',
-                                                                    'PDAConsensus'))
-  
+classification_all <- PDACMOC::omni.classify(samples, batch = FALSE, gene_id = 'EnsemblID',
+                                             classifier = c('Collisson', 'Moffitt', 'Bailey',
+                                                            'Puleo', 'Chan-Seng-Yue', 'PDAConsensus'),
+                                             stroma = TRUE,
+                                             stroma_classifier = c('Moffitt',
+                                                                   'Maurer',
+                                                                   'PDAConsensus'))
+
 # change path to your browser
 options(browser = '/usr/bin/firefox')
 shinyjs::useShinyjs()

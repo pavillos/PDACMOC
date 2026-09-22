@@ -83,9 +83,9 @@
   \pkg{PDACMOC} runs on Linux and needs conda (Miniforge or Miniconda, \url{https://conda-forge.org/download/}).
   The installer creates a conda environment called \code{pdacmoc} with R, Python and all the dependencies:
   \preformatted{
-wget https://github.com/pavillos/PDACMOC/releases/download/v.2.6.0/PDACMOC_2.6.0.tar.gz
-tar -xzf PDACMOC_2.6.0.tar.gz
-bash PDACMOC/install/install.sh PDACMOC_2.6.0.tar.gz
+wget https://github.com/pavillos/PDACMOC/releases/download/v.2.6.1/PDACMOC_2.6.1.tar.gz
+tar -xzf PDACMOC_2.6.1.tar.gz
+bash PDACMOC/install/install.sh PDACMOC_2.6.1.tar.gz
   }
   To use it, run \code{conda activate pdacmoc}, open R and load the package, pointing \pkg{reticulate}
   to the Python of the environment (the installer prints its path):
@@ -201,7 +201,7 @@ classification <- omni.classify(counts, gene_id = 'EnsemblID')
   #load(dir)
   rm(file1)
 
-  # change path to your miniconda3 environment
+  # Python of the pdacmoc environment (printed by the installer)
   reticulate::use_python('~/miniconda3/envs/pdacmoc/bin/python', required = TRUE)
 
   file2 <- system.file('training_data', 'all_datasets_corrected.csv', package = 'PDACMOC')
@@ -231,18 +231,18 @@ classification <- omni.classify(counts, gene_id = 'EnsemblID')
 
   results_stroma_consensus <- PDACMOC:::stroma.PDAConsensus.classify(vm_result$vm_S)
 
-  classification_tumor <- PDACMOC:::omni.classify(samples, batch = FALSE, gene_id = 'EnsemblID',
-                                                  classifier = c('Collisson', 'Moffitt', 'Bailey',
-                                                                 'Puleo', 'Chan-Seng-Yue', 'PDAConsensus'))
+  classification_tumor <- PDACMOC::omni.classify(samples, batch = FALSE, gene_id = 'EnsemblID',
+                                                 classifier = c('Collisson', 'Moffitt', 'Bailey',
+                                                                'Puleo', 'Chan-Seng-Yue', 'PDAConsensus'))
 
-  classification_all <- PDACMOC:::omni.classify(samples, batch = FALSE, gene_id = 'EnsemblID',
-                                                classifier = c('Collisson', 'Moffitt', 'Bailey',
-                                                               'Puleo', 'Chan-Seng-Yue', 'PDAConsensus'),
-                                                stroma = TRUE,
-                                                stroma_classifier = c('Moffitt',
-                                                                      'Maurer',
-                                                                      'PDAConsensus'))
-  
+  classification_all <- PDACMOC::omni.classify(samples, batch = FALSE, gene_id = 'EnsemblID',
+                                               classifier = c('Collisson', 'Moffitt', 'Bailey',
+                                                              'Puleo', 'Chan-Seng-Yue', 'PDAConsensus'),
+                                               stroma = TRUE,
+                                               stroma_classifier = c('Moffitt',
+                                                                     'Maurer',
+                                                                     'PDAConsensus'))
+
   # change path to your browser
   options(browser = '/usr/bin/firefox')
   shinyjs::useShinyjs()
